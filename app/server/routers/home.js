@@ -131,6 +131,25 @@ module.exports = function(app,nodeuuid){
 	});
 
 	//--------------------------------
+	// Register
+	// Return: Return token
+	//--------------------------------
+	app.post('/register',function(req,res){
+		var input = req.body;
+		var userid = input.txtUserName;
+		var password = input.txtPassword;
+		var email = input.txtEmail;
+		accountModel.addUser(userid,password,email, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else {
+				res.json(objects,200);
+			}
+		});
+	});
+
+	//--------------------------------
 	// Logout
 	// Return: Return status
 	//--------------------------------

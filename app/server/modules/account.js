@@ -52,3 +52,24 @@ exports.getUserInfo = function(userid,callback){
 			callback(null,result);
 	});
 }
+
+// Add user
+exports.addUser = function(userid,password,email,callback){
+	// account{name,userid,password,email,country,favour_food,favour_location,notes,registerdate}
+	var iDate = new Date();
+	accountDB.insert({"name":"",
+					"userid":userid,
+					"password":password,
+					"email":email,
+					"country":"Viet Nam",
+					"favour_food":"",
+					"favour_location":"",
+					"notes":"",
+					registerdate:iDate
+					},function(err,result){
+		if(err)
+			callback(null,'Can not register user');
+		else
+			callback(null,result);
+	});
+}
