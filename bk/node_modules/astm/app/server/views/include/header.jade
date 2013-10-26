@@ -1,0 +1,47 @@
+#navbar.navbar
+	
+	button(type="button", class="navbar-toggle navbar-btn collapsed", data-toggle="collapse", data-target="#sidebar")
+		span(class="icon-reorder")
+	a(class="navbar-brand", href="#")
+		small
+			i(class="icon-desktop")
+			| &nbsp;FLATY Admin
+	ul(class="nav flaty-nav pull-right")
+		li(class="hidden-xs")
+			a(data-toggle="dropdown", class="dropdown-toggle", href="#")
+				i(class="icon-tasks")
+				span(class="badge badge-warning") 4
+		li(class="user-profile")
+			a(data-toggle="dropdown", href="#", class="user-menu dropdown-toggle")
+				img(class="nav-user-photo", src="images/avatar1.jpg", alt="Penny's Photo")
+				span(class="hidden-sm", id="user_info") Penny
+				i(class="icon-caret-down")
+			ul(class="dropdown-menu dropdown-navbar", id="user_menu")
+				li(class="nav-header")
+					i(class="icon-time") Logined From 20:45
+				li
+					a(href="#")
+						i(class="icon-cog") Account Settings
+				li
+					a(href="#")
+						i(class="icon-user") Edit Profile
+				li
+					a(href="#")
+						i(class="icon-question") Help
+				li(class="divider visible-sm")
+				li(class="visible-sm")
+					a(href="#")
+						i(class="icon-tasks")Tasks
+						span(class="badge badge-warning")4
+				li(class="visible-sm")
+					a(href="#")
+						i(class="icon-bell-alt") Notifications
+						span(class="badge badge-important")8
+				li(class="visible-sm")
+					a(href="#")
+						i(class="icon-envelope") Messages
+						span(class="badge badge-success")5
+				li(class="divider")
+				li
+					a(href="#")
+						i(class="icon-off") Logout
