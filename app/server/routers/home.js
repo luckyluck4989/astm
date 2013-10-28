@@ -1,5 +1,7 @@
 var accountModel = require('../modules/account')
 var locationModel = require('../modules/location')
+var imageModel = require('../modules/image')
+var geogModel = require('../modules/geog')
 
 module.exports = function(app,nodeuuid){
 	app.get('/home',function(req,res){
@@ -100,7 +102,7 @@ module.exports = function(app,nodeuuid){
 			if (err) {
 				res.json(error, 400);
 				return;
-			} else if(objects.userid != undefined ){
+			} else if(objects != null && objects.userid != undefined ){
 				var token = nodeuuid.v4();
 				accountModel.insertToken(userid,token, function (err, objects) {
 					if (err) {
@@ -110,6 +112,8 @@ module.exports = function(app,nodeuuid){
 						res.json(objects,200);
 					}
 				});
+			} else {
+				res.json('Invalid login information', 400);
 			}
 		});
 	});
@@ -132,7 +136,7 @@ module.exports = function(app,nodeuuid){
 
 	//--------------------------------
 	// Register
-	// Return: Return token
+	// Return: JSON user info
 	//--------------------------------
 	app.post('/register',function(req,res){
 		var input = req.body;
@@ -151,7 +155,7 @@ module.exports = function(app,nodeuuid){
 
 	//--------------------------------
 	// Logout
-	// Return: Return status
+	// Return: JSON user info
 	//--------------------------------
 	app.get('/getuserinfo',function(req,res){
 		var token = req.param('token');
@@ -159,7 +163,7 @@ module.exports = function(app,nodeuuid){
 			if (err) {
 				res.json(error, 400);
 				return;
-			} else if(objects.userid != undefined ){
+			} else if(objects != null && objects.userid != undefined ){
 				accountModel.getUserInfo(objects.userid, function (err, objects) {
 					if (err) {
 						res.json(error, 400);
@@ -168,13 +172,15 @@ module.exports = function(app,nodeuuid){
 						res.json(objects,200);
 					}
 				});
+			} else {
+				res.json('Invalid token', 400);
 			}
 		});
 	});
 
 	//--------------------------------
 	// Logout
-	// Return: Return status
+	// Return: JSON list location
 	//--------------------------------
 	app.get('/getrecommendlocation',function(req,res){
 		var token = req.param('token');
@@ -182,7 +188,7 @@ module.exports = function(app,nodeuuid){
 			if (err) {
 				res.json(error, 400);
 				return;
-			} else if(objects.userid != undefined ){
+			} else if(objects != null && objects.userid != undefined ){
 				locationModel.getRecommendLocation(objects.userid, function (err, retJson) {
 					if (err) {
 						res.json(error, 400);
@@ -191,6 +197,166 @@ module.exports = function(app,nodeuuid){
 						res.json(retJson,200);
 					}
 				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Logout
+	// Return: JSON list location
+	//--------------------------------
+	app.get('/getlocationbyaddress',function(req,res){
+		var token = req.param('token');
+		var country = req.param('country');
+		var city = req.param('city');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.getLocationByAddress(objects.userid, country, city, function (err, retJson) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(retJson,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Get Location
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/getlocation',function(req,res){
+		var token = req.param('token');
+		var locationid = req.param('locationid');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.getLocation(locationid, function (err, retJson) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(retJson,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Get list image by userid
+	// Return: JSON image info
+	//--------------------------------
+	app.get('/getprivateimage',function(req,res){
+		var token = req.param('token');
+		var page = req.param('page');
+		var offset = req.param('offset');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.getPrivateImage(objects.userid,page,offset, function (err, retJson) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(retJson,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Get image by imageid
+	// Return: JSON image info
+	//--------------------------------
+	app.get('/getimage',function(req,res){
+		var token = req.param('token');
+		var imageid = req.param('imageid');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.getImage(imageid, function (err, retJson) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(retJson,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Upload image
+	// Return: JSON image info
+	//--------------------------------
+	app.post('/uploadimage',function(req,res){
+		var input = req.body;
+		var token = input.token;
+		var faceid = input.faceid;
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.addImage(objects.userid, faceid, req.files.photos, function (err, objects) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(objects,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Get list country
+	// Return: JSON list country
+	//--------------------------------
+	app.get('/getlistcountry',function(req,res){
+		var token = req.param('token');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				geogModel.getListCountry(function (err, retJson) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(retJson,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
 			}
 		});
 	});

@@ -69,9 +69,43 @@ exports.addLocation = function(input, callback){
 	locationDB.save(itemEntry, {safe: true}, callback);
 }
 
-// Get user info
+//--------------------------------
+// Get list recommend location
+// Param userid: current user
+// Param callback: funtion callback
+//--------------------------------
 exports.getRecommendLocation = function(userid,callback){
 	locationDB.find({"isrecommend":"true"}).toArray(function(err,result){
+		if(err)
+			callback(null,'Can not get list location');
+		else
+			callback(null,result);
+	});
+}
+
+//--------------------------------
+// Get list location with country, city
+// Param userid: current user
+// Param country: country of location
+// Param city: city of location
+// Param callback: funtion callback
+//--------------------------------
+exports.getLocationByAddress = function(userid, country, city, callback){
+	locationDB.find({"country":country,"city":city}).toArray(function(err,result){
+		if(err)
+			callback(null,'Can not get list location');
+		else
+			callback(null,result);
+	});
+}
+
+//--------------------------------
+// Get location info
+// Param locationid: id of location
+// Param callback: funtion callback
+//--------------------------------
+exports.getLocation = function(locationid, callback){
+	locationDB.findOne({_id:new ObjectID(locationid)}, function(err,result){
 		if(err)
 			callback(null,'Can not get list location');
 		else

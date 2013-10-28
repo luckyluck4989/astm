@@ -32,6 +32,9 @@ db.open(function(e, p_client){
 module.exports = {
 		account:db.collection('account'),
 		location:db.collection('location'),
+		image:db.collection('userimage'),
+		country:db.collection('country'),
+		city:db.collection('city'),
 		systemstatus:db.collection('systemstatus'),
 		crypto:crypto,
 		ObjectID:ObjectID,

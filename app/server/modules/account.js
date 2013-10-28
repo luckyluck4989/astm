@@ -37,7 +37,7 @@ exports.logOut = function(token,callback){
 exports.checkToken = function(token,callback){
 	systemDB.findOne({"token":token},function(err,result){
 		if(err)
-			callback(null,'Can not logout');
+			callback(null,'Can not check token');
 		else
 			callback(null,result);
 	});
