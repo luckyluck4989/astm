@@ -311,7 +311,7 @@ module.exports = function(app,nodeuuid){
 
 	//--------------------------------
 	// Upload image
-	// Return: JSON image info
+	// Return: JSON image
 	//--------------------------------
 	app.post('/uploadimage',function(req,res){
 		var input = req.body;
