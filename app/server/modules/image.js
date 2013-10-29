@@ -72,3 +72,34 @@ exports.addImage = function(userid, faceid, image, callback){
 			callback(null,result);
 	});
 }
+
+// Get list image whats hot
+exports.getWhatsHotImage = function(callback){
+	var iOffset = 30;
+	imageDB.find({}).sort([['like','desc']]).limit(iOffset).toArray(function(err,result){
+		if(err)
+			callback(null,'Can not get list image');
+		else
+			callback(null,result);
+	});
+}
+
+// Add like image
+exports.addImageLike = function(imageid, callback){
+	imageDB.update({'image':imageid}, {$inc:{'like':1}}, function(err,result){
+		if(err)
+			callback(null,'Can not get list image');
+		else
+			callback(null,result);
+	});
+}
+
+// Add comment
+exports.addImageComment = function(imageid, callback){
+	imageDB.update({'image':imageid}, {$inc:{'comment':1}}, function(err,result){
+		if(err)
+			callback(null,'Can not get list image');
+		else
+			callback(null,result);
+	});
+}

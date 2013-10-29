@@ -360,4 +360,106 @@ module.exports = function(app,nodeuuid){
 			}
 		});
 	});
+
+	//--------------------------------
+	// Get list country
+	// Return: JSON list country
+	//--------------------------------
+	app.get('/getlistcity',function(req,res){
+		var token = req.param('token');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				geogModel.getListCity(function (err, retJson) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(retJson,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Get list image what's hot
+	// Return: JSON list image
+	//--------------------------------
+	app.get('/getwhatshotimage',function(req,res){
+		var token = req.param('token');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.getWhatsHotImage(function (err, retJson) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(retJson,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Add like for image
+	// Return: JSON image info
+	//--------------------------------
+	app.get('/addimagelike',function(req,res){
+		var token = req.param('token');
+		var imageid = req.param('imageid');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.addImageLike(imageid, function (err, retJson) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(retJson,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Add comment for image
+	// Return: JSON image info
+	//--------------------------------
+	app.get('/addimagecomment',function(req,res){
+		var token = req.param('token');
+		var imageid = req.param('imageid');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				res.json(error, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.addImageComment(imageid, function (err, retJson) {
+					if (err) {
+						res.json(error, 400);
+						return;
+					} else {
+						res.json(retJson,200);
+					}
+				});
+			} else {
+				res.json('Invalid token', 400);
+			}
+		});
+	});
 };
