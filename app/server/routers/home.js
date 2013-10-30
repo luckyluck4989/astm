@@ -3,30 +3,50 @@ var locationModel = require('../modules/location')
 var imageModel = require('../modules/image')
 var geogModel = require('../modules/geog')
 
+//--------------------------------
+// Define Variable
+//--------------------------------
+var SYSTEM_ERR = 'ERROR';
+var SYSTEM_SUC = 'SUCESS';
+var STATUS_SUCESS = 200;
+var STATUS_FAIL = 400;
+var METHOD_POS = 'POS';
+var METHOD_GET = 'GET';
+
+//--------------------------------
+// Define Message
+//--------------------------------
+var MSG_LOGINFAIL = 'Username or password is not correctly';
+var MSG_INVALID_TOKEN = 'Your token is invalid';
+
+//--------------------------------
+// SAMPLE RESULT JSON
+// param func: function name excute
+// mthod: method excute [POST/GET]
+// stt: result status of function
+// msg: message status
+// err: error detail of result excute function
+// res: result of function
+// Return: json result
+//--------------------------------
+function createJsonResult(func,mthod,stt,msg,err,res){
+	var jsonResult = {	func_cd: func,
+						method: mthod,
+						status: stt,
+						message: msg,
+						error: err,
+						result: res,
+					};
+	return jsonResult;
+}
+
 module.exports = function(app,nodeuuid){
 	app.get('/home',function(req,res){
-		//accountModel.findAllAccount(function(err,result){
-		//	res.send(result,200);
-		//});
 		res.render('block/location', { title: 'Admin Page' });
 	});
 
 	app.get('/admin',function(req,res){
 		res.render('block/admin', { title: 'Admin Page' });
-	});
-	
-	app.get('/index',function(req,res){
-		var param1 = req.query.param1;
-		var param2 = req.query.param2;
-		console.log('param1:' + param1);
-		console.log('param2:' + param2);
-	});
-
-	app.post('/upload',function(req,res){
-		var param1 = req.param('param1');
-		var param2 = req.param('param2');
-		console.log('param1:' + param1);
-		console.log('param2:' + param2);
 	});
 
 	//--------------------------------
@@ -98,22 +118,26 @@ module.exports = function(app,nodeuuid){
 		var input = req.body;
 		var userid = input.txtUserName;
 		var password = input.txtPassword;
-		accountModel.checkLogin(userid,password, function (err, objects) {
+		accountModel.checkLogin(userid, password, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				var token = nodeuuid.v4();
 				accountModel.insertToken(userid,token, function (err, objects) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, error, null);
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(objects,200);
+						var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, objects);
+						res.json(jsonResult, 200);
 					}
 				});
 			} else {
-				res.json('Invalid login information', 400);
+				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, MSG_LOGINFAIL, null);
+				res.json(jsonResult, 400);
 			}
 		});
 	});
@@ -126,10 +150,12 @@ module.exports = function(app,nodeuuid){
 		var token = req.param('token');
 		accountModel.logOut(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('Logout', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null);
+				res.json(jsonResult, 400);
 				return;
 			} else {
-				res.json(objects,200);
+				var jsonResult = createJsonResult('Logout', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, objects);
+				res.json(jsonResult,200);
 			}
 		});
 	});
@@ -145,66 +171,76 @@ module.exports = function(app,nodeuuid){
 		var email = input.txtEmail;
 		accountModel.addUser(userid,password,email, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('Register', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, error, null);
+				res.json(jsonResult, 400);
 				return;
 			} else {
-				res.json(objects,200);
+				var jsonResult = createJsonResult('Register', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, objects);
+				res.json(jsonResult,200);
 			}
 		});
 	});
 
 	//--------------------------------
-	// Logout
+	// Get User Info
 	// Return: JSON user info
 	//--------------------------------
 	app.get('/getuserinfo',function(req,res){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('GetUserInfo', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null);
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
-				accountModel.getUserInfo(objects.userid, function (err, objects) {
+				accountModel.getUserInfo(objects.userid, function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('GetUserInfo', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null);
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(objects,200);
+						var jsonResult = createJsonResult('GetUserInfo', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('GetUserInfo', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
 
 	//--------------------------------
-	// Logout
+	// Get recommend location
 	// Return: JSON list location
 	//--------------------------------
 	app.get('/getrecommendlocation',function(req,res){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('GetRecommendLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				locationModel.getRecommendLocation(objects.userid, function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('GetRecommendLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('GetRecommendLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('GetRecommendLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
 
 	//--------------------------------
-	// Logout
+	// Get location by address
 	// Return: JSON list location
 	//--------------------------------
 	app.get('/getlocationbyaddress',function(req,res){
@@ -213,19 +249,23 @@ module.exports = function(app,nodeuuid){
 		var city = req.param('city');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('GetLocationByAddress', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				locationModel.getLocationByAddress(objects.userid, country, city, function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('GetLocationByAddress', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('GetLocationByAddress', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('GetLocationByAddress', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
@@ -239,19 +279,23 @@ module.exports = function(app,nodeuuid){
 		var locationid = req.param('locationid');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				locationModel.getLocation(locationid, function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
@@ -266,19 +310,23 @@ module.exports = function(app,nodeuuid){
 		var offset = req.param('offset');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('GetPrivateImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.getPrivateImage(objects.userid,page,offset, function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('GetPrivateImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('GetPrivateImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('GetPrivateImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
@@ -292,19 +340,23 @@ module.exports = function(app,nodeuuid){
 		var imageid = req.param('imageid');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('GetImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.getImage(imageid, function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('GetImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('GetImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('GetImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
@@ -319,19 +371,23 @@ module.exports = function(app,nodeuuid){
 		var faceid = input.faceid;
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
-				imageModel.addImage(objects.userid, faceid, req.files.photos, function (err, objects) {
+				imageModel.addImage(objects.userid, faceid, req.files.photos, function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(objects,200);
+						var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
@@ -344,44 +400,52 @@ module.exports = function(app,nodeuuid){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				geogModel.getListCountry(function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
 
 	//--------------------------------
-	// Get list country
+	// Get list city
 	// Return: JSON list country
 	//--------------------------------
 	app.get('/getlistcity',function(req,res){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('GetListCity', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				geogModel.getListCity(function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('GetListCity', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('GetListCity', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('GetListCity', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
@@ -394,19 +458,23 @@ module.exports = function(app,nodeuuid){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('GetWhatsHotImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.getWhatsHotImage(function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('GetWhatsHotImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('GetWhatsHotImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('GetWhatsHotImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
@@ -420,19 +488,23 @@ module.exports = function(app,nodeuuid){
 		var imageid = req.param('imageid');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('AddImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.addImageLike(imageid, function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('AddImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('AddImageLike', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('AddImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});
@@ -446,19 +518,23 @@ module.exports = function(app,nodeuuid){
 		var imageid = req.param('imageid');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				res.json(error, 400);
+				var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.addImageComment(imageid, function (err, retJson) {
 					if (err) {
-						res.json(error, 400);
+						var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						res.json(jsonResult, 400);
 						return;
 					} else {
-						res.json(retJson,200);
+						var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
 					}
 				});
 			} else {
-				res.json('Invalid token', 400);
+				var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
 			}
 		});
 	});

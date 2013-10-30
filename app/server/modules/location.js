@@ -46,7 +46,7 @@ exports.addImage = function(input, image, callback){
 //--------------------------------
 exports.addLocation = function(input, callback){
 	// Define item insert to database
-	var itemEntry = { 	namelocation: 'Jack1',
+	var itemEntry = {	namelocation: 'Jack1',
 						country: 'vn',
 						city: 'hochiminh-quan2',
 						isrecommend: '',
