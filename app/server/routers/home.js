@@ -137,7 +137,7 @@ module.exports = function(app,nodeuuid){
 				});
 			} else {
 				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, MSG_LOGINFAIL, null);
-				res.json(jsonResult, 400);
+				res.json(jsonResult, 200);
 			}
 		});
 	});
@@ -387,7 +387,7 @@ module.exports = function(app,nodeuuid){
 				});
 			} else {
 				var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
-				res.json(jsonResult, 400);
+				res.json(jsonResult, 200);
 			}
 		});
 	});
