@@ -75,7 +75,7 @@ module.exports = function(app,nodeuuid){
 					// Call function upload images
 					locationModel.addImage(input, req.files.photos[0][i], function (err, objects) {
 						if (err) {
-							res.json(error, 400);
+							res.json(err, 400);
 							return;
 						} else {
 							arr.push(objects);
@@ -86,7 +86,7 @@ module.exports = function(app,nodeuuid){
 			} else {
 				locationModel.addImage(input, req.files.photos[0], function (err, objects) {
 					if (err) {
-						res.json(error, 400);
+						res.json(err, 400);
 						return;
 					} else {
 						arr.push(objects);
@@ -99,14 +99,20 @@ module.exports = function(app,nodeuuid){
 		// Case: Entry data
 		//--------------------------------
 		} else {
-			locationModel.addLocation(input, function (err, objects) {
+			locationModel.picturesOpFacebookOAuthIdGET(function (err, tokenObject) {
 				if (err) {
-					res.json(error, 400);
-					return;
+					res.json(err,400);
+				} else {
+					locationModel.addLocation(input, function (err, objects) {
+						if (err) {
+							res.json(err, 400);
+							return;
+						} else {
+							res.json("Success",200);
+						}
+					});
 				}
 			});
-
-			res.json("Success",200);
 		}
 	});
 

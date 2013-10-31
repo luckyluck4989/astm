@@ -3,6 +3,10 @@ var cnMongoDB = require('../mongodb/connection'),
 				fs = require("fs");
 var MongoDb = require("mongodb");
 var locationDB = cnMongoDB.location;
+var https = require('https'); //Https module of Node.js
+var FormData = require('form-data'); //Pretty multipart form maker.
+var oauth = require('oauth');
+var ACCESS_TOKEN = "CAACEdEose0cBAAdAQuH6ReIxA4dHGWgcer9m1cWUrDjrjtZBmtZArA5vSo2jjCYkZA2m3zd8g4D3i2S7ZCjPd495gwlwTZAsOeXcpxSRVRtIvGupT3KvPl4WuBZCzovLKe2KxjYIeFp0890hdgnVnoRtyZBhkciqIspWYtibb47ePUVqmKDgUmWkA9KCaWKucwZD";
 
 //--------------------------------
 // Function Add Image
@@ -45,7 +49,9 @@ exports.addImage = function(input, image, callback){
 // Param callback: funtion callback
 //--------------------------------
 exports.addLocation = function(input, callback){
+	//-----------------------------------------
 	// Define item insert to database
+	//-----------------------------------------
 	var itemEntry = {	namelocation: 'Jack1',
 						country: 'vn',
 						city: 'hochiminh-quan2',
@@ -53,7 +59,10 @@ exports.addLocation = function(input, callback){
 						description: '',
 						imagelist: [],
 						imagethumb: '',
-						coordinate: []
+						coordinate: [],
+						like: 0,
+						comment: 0,
+						fbid: ''
 					};
 	itemEntry.namelocation = input.namelocation;
 	itemEntry.country = input.country;
@@ -66,7 +75,46 @@ exports.addLocation = function(input, callback){
 	if (itemEntry._id) {
 		itemEntry._id = new ObjectID(itemEntry._id);
 	}
-	locationDB.save(itemEntry, {safe: true}, callback);
+
+	//-----------------------------------------
+	// Post to facebook
+	//-----------------------------------------
+	var form = new FormData(); //Create multipart form
+	form.append('file', fs.createReadStream('./app/public/upload/'+ itemEntry.imagethumb)); //Put file
+	form.append('message', itemEntry.description); //Put message
+	 
+	//POST request options, notice 'path' has access_token parameter
+	var options = {
+		method: 'post',
+		host: 'graph.facebook.com',
+		path: '/me/photos?access_token='+ACCESS_TOKEN,
+		headers: form.getHeaders(),
+	}
+
+	//Do POST request, callback for response
+	var request = https.request(options, function (response){
+		//console.log('STATUS: ' + response.statusCode);
+		//console.log('HEADERS: ' + JSON.stringify(response.headers));
+		response.setEncoding('utf8');
+
+		response.on('data', function(chunk) {
+			itemEntry.fbid = (JSON.parse(chunk)).id;
+			console.log(itemEntry.fbid);
+		});
+
+		response.on('end', function() {
+			locationDB.save(itemEntry, {safe: true}, callback);
+		});
+
+	});
+	 
+	//Binds form to request
+	form.pipe(request);
+
+	//If anything goes wrong (request-wise not FB)
+	request.on('error', function (error) {
+		callback(error,null);
+	});
 }
 
 //--------------------------------
@@ -112,3 +160,27 @@ exports.getLocation = function(locationid, callback){
 			callback(null,result);
 	});
 }
+
+exports.picturesOpFacebookOAuthIdGET = function(req, res) {
+	//logger.info("GET /pictures/op/facebookOAuth/" + req.params.pictureId);
+
+	var client_id	 = "234435456715656";
+	var client_secret = "d2d0e0d101cb07f0b70ed2175cc066c0";
+
+	oa = new oauth.OAuth2(client_id, client_secret, "https://graph.facebook.com");
+	/*
+	res.redirect(oa.getAuthorizeUrl(
+		{
+			scope		  : "publish_stream", // Gets permission for posting to the users timeline
+			response_type : "code",
+			redirect_uri  : "http://localhost:3000/pictures/op/facebookUpload/" + req.params.pictureId
+		}
+	));
+	*/
+	oa.getOAuthAccessToken(
+	'',
+	{'grant_type':'client_credentials'},
+	function (e, access_token, refresh_token, results){
+		console.log('bearer: ',access_token);
+	});
+};
