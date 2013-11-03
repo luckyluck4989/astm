@@ -6,7 +6,7 @@ var systemDB  = cnMongoDB.systemstatus;
 exports.checkLogin = function(userid,password,callback){
 	accountDB.findOne({$and:[{"userid":userid,"password":password}]},function(err,result){
 		if(err)
-			callback(null,'Can not login');
+			callback(err,'Can not login');
 		else
 			callback(null,result);
 	});
@@ -17,7 +17,7 @@ exports.insertToken = function(userid,token,callback){
 	var iDate = new Date();
 	systemDB.insert({"token":token,"userid":userid,"lastedit":iDate},function(err,result){
 		if(err)
-			callback(null,'Can not login');
+			callback(err,'Can not login');
 		else
 			callback(null,result);
 	});
@@ -27,7 +27,7 @@ exports.insertToken = function(userid,token,callback){
 exports.logOut = function(token,callback){
 	systemDB.remove({"token":token},function(err,result){
 		if(err)
-			callback(null,'Can not logout');
+			callback(err,'Can not logout');
 		else
 			callback(null,result);
 	});
@@ -37,7 +37,7 @@ exports.logOut = function(token,callback){
 exports.checkToken = function(token,callback){
 	systemDB.findOne({"token":token},function(err,result){
 		if(err)
-			callback(null,'Can not check token');
+			callback(err,'Can not check token');
 		else
 			callback(null,result);
 	});
@@ -47,7 +47,7 @@ exports.checkToken = function(token,callback){
 exports.getUserInfo = function(userid,callback){
 	accountDB.findOne({"userid":userid},function(err,result){
 		if(err)
-			callback(null,'Can not get user info');
+			callback(err,'Can not get user info');
 		else
 			callback(null,result);
 	});
@@ -68,7 +68,7 @@ exports.addUser = function(userid,password,email,callback){
 					registerdate:iDate
 					},function(err,result){
 		if(err)
-			callback(null,'Can not register user');
+			callback(err,'Can not register user');
 		else
 			callback(null,result);
 	});

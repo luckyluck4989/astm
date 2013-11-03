@@ -9,7 +9,7 @@ exports.getPrivateImage = function(userid,page,offset,callback){
 	var iOffset = page * offset;
 	imageDB.find({"userid":userid}).skip(iSkip).limit(iOffset).toArray(function(err,result){
 		if(err)
-			callback(null,'Can not get list image');
+			callback(err,'Can not get list image');
 		else
 			callback(null,result);
 	});
@@ -19,7 +19,7 @@ exports.getPrivateImage = function(userid,page,offset,callback){
 exports.getImage = function(imageid,callback){
 	imageDB.findOne({"image":imageid}, function(err,result){
 		if(err)
-			callback(null,'Can not get image');
+			callback(err,'Can not get image');
 		else
 			callback(null,result);
 	});
@@ -67,7 +67,7 @@ exports.addImage = function(userid, faceid, image, callback){
 						"addatetime": iDate
 					},function(err,result){
 		if(err)
-			callback(null,'Can not upload image');
+			callback(err,'Can not upload image');
 		else
 			callback(null,result);
 	});
@@ -78,7 +78,7 @@ exports.getWhatsHotImage = function(callback){
 	var iOffset = 30;
 	imageDB.find({}).sort([['like','desc']]).limit(iOffset).toArray(function(err,result){
 		if(err)
-			callback(null,'Can not get list image');
+			callback(err,'Can not get list image');
 		else
 			callback(null,result);
 	});
@@ -88,7 +88,7 @@ exports.getWhatsHotImage = function(callback){
 exports.addImageLike = function(imageid, callback){
 	imageDB.update({'image':imageid}, {$inc:{'like':1}}, function(err,result){
 		if(err)
-			callback(null,'Can not get list image');
+			callback(err,'Can not get list image');
 		else
 			callback(null,result);
 	});
@@ -98,7 +98,7 @@ exports.addImageLike = function(imageid, callback){
 exports.addImageComment = function(imageid, callback){
 	imageDB.update({'image':imageid}, {$inc:{'comment':1}}, function(err,result){
 		if(err)
-			callback(null,'Can not get list image');
+			callback(err,'Can not get list image');
 		else
 			callback(null,result);
 	});

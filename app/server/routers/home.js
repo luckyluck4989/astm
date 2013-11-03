@@ -41,6 +41,10 @@ function createJsonResult(func,mthod,stt,msg,err,res){
 }
 
 module.exports = function(app,nodeuuid){
+	app.get('/',function(req,res){
+		res.render('block/admin', { title: 'Admin Page' });
+	});
+
 	app.get('/home',function(req,res){
 		res.render('block/location', { title: 'Admin Page' });
 	});
@@ -99,18 +103,12 @@ module.exports = function(app,nodeuuid){
 		// Case: Entry data
 		//--------------------------------
 		} else {
-			locationModel.picturesOpFacebookOAuthIdGET(function (err, tokenObject) {
+			locationModel.addLocation(input, function (err, objects) {
 				if (err) {
-					res.json(err,400);
+					res.json(err, 400);
+					return;
 				} else {
-					locationModel.addLocation(input, function (err, objects) {
-						if (err) {
-							res.json(err, 400);
-							return;
-						} else {
-							res.json("Success",200);
-						}
-					});
+					res.json("Success",200);
 				}
 			});
 		}
@@ -126,14 +124,14 @@ module.exports = function(app,nodeuuid){
 		var password = input.txtPassword;
 		accountModel.checkLogin(userid, password, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				var token = nodeuuid.v4();
 				accountModel.insertToken(userid,token, function (err, objects) {
 					if (err) {
-						var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, error, null);
+						var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null);
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -156,7 +154,7 @@ module.exports = function(app,nodeuuid){
 		var token = req.param('token');
 		accountModel.logOut(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('Logout', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null);
+				var jsonResult = createJsonResult('Logout', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
 				res.json(jsonResult, 400);
 				return;
 			} else {
@@ -177,7 +175,7 @@ module.exports = function(app,nodeuuid){
 		var email = input.txtEmail;
 		accountModel.addUser(userid,password,email, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('Register', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, error, null);
+				var jsonResult = createJsonResult('Register', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null);
 				res.json(jsonResult, 400);
 				return;
 			} else {
@@ -195,13 +193,13 @@ module.exports = function(app,nodeuuid){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('GetUserInfo', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null);
+				var jsonResult = createJsonResult('GetUserInfo', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				accountModel.getUserInfo(objects.userid, function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('GetUserInfo', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null);
+						var jsonResult = createJsonResult('GetUserInfo', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -224,13 +222,13 @@ module.exports = function(app,nodeuuid){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('GetRecommendLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('GetRecommendLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				locationModel.getRecommendLocation(objects.userid, function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('GetRecommendLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('GetRecommendLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -255,13 +253,13 @@ module.exports = function(app,nodeuuid){
 		var city = req.param('city');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('GetLocationByAddress', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('GetLocationByAddress', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				locationModel.getLocationByAddress(objects.userid, country, city, function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('GetLocationByAddress', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('GetLocationByAddress', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -277,6 +275,38 @@ module.exports = function(app,nodeuuid){
 	});
 
 	//--------------------------------
+	// Get recommend location
+	// Return: JSON list location
+	//--------------------------------
+	app.get('/getlocationbydistance',function(req,res){
+		var token = req.param('token');
+		var distance = req.param('distance');
+		var lon = req.param('lon');
+		var lat = req.param('lat');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('GetLocationByDistance', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.getLocationByDistance(distance, lon, lat, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('GetLocationByDistance', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('GetLocationByDistance', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('GetLocationByDistance', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
 	// Get Location
 	// Return: JSON location info
 	//--------------------------------
@@ -285,13 +315,13 @@ module.exports = function(app,nodeuuid){
 		var locationid = req.param('locationid');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				locationModel.getLocation(locationid, function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -316,13 +346,13 @@ module.exports = function(app,nodeuuid){
 		var offset = req.param('offset');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('GetPrivateImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('GetPrivateImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.getPrivateImage(objects.userid,page,offset, function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('GetPrivateImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('GetPrivateImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -346,13 +376,13 @@ module.exports = function(app,nodeuuid){
 		var imageid = req.param('imageid');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('GetImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('GetImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.getImage(imageid, function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('GetImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('GetImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -377,13 +407,13 @@ module.exports = function(app,nodeuuid){
 		var faceid = input.faceid;
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.addImage(objects.userid, faceid, req.files.photos, function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -406,13 +436,13 @@ module.exports = function(app,nodeuuid){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				geogModel.getListCountry(function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -435,13 +465,13 @@ module.exports = function(app,nodeuuid){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('GetListCity', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('GetListCity', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				geogModel.getListCity(function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('GetListCity', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('GetListCity', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -464,13 +494,13 @@ module.exports = function(app,nodeuuid){
 		var token = req.param('token');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('GetWhatsHotImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('GetWhatsHotImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.getWhatsHotImage(function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('GetWhatsHotImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('GetWhatsHotImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -494,13 +524,13 @@ module.exports = function(app,nodeuuid){
 		var imageid = req.param('imageid');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('AddImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('AddImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.addImageLike(imageid, function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('AddImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('AddImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {
@@ -524,13 +554,13 @@ module.exports = function(app,nodeuuid){
 		var imageid = req.param('imageid');
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+				var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				imageModel.addImageComment(imageid, function (err, retJson) {
 					if (err) {
-						var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, error, null)
+						var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
 						return;
 					} else {

@@ -5,8 +5,7 @@ var MongoDb = require("mongodb");
 var locationDB = cnMongoDB.location;
 var https = require('https'); //Https module of Node.js
 var FormData = require('form-data'); //Pretty multipart form maker.
-var oauth = require('oauth');
-var ACCESS_TOKEN = "CAACEdEose0cBAAdAQuH6ReIxA4dHGWgcer9m1cWUrDjrjtZBmtZArA5vSo2jjCYkZA2m3zd8g4D3i2S7ZCjPd495gwlwTZAsOeXcpxSRVRtIvGupT3KvPl4WuBZCzovLKe2KxjYIeFp0890hdgnVnoRtyZBhkciqIspWYtibb47ePUVqmKDgUmWkA9KCaWKucwZD";
+var ACCESS_TOKEN = "CAAICtp62IZBgBAIZAtT14faF6niwKWrXL9geaZCq4JGUMeXvPbe7AvryLkSVZCfiRoNRbgk6zsUX2oBsmeldZA1FRaQS7S3aFV4Ax3t6TSqlhXA7xY4Wannzo9Ldt5VP2NYctCWuZCbx5r5cvGlZCwz5VxBZAx4X8sP2E0sJ9AaMZBbyIgtsuDiidxcRVrZCbp4E4ZD";
 
 //--------------------------------
 // Function Add Image
@@ -70,7 +69,8 @@ exports.addLocation = function(input, callback){
 	itemEntry.description = input.description;
 	itemEntry.imagelist = input.imagelist.split(",");
 	itemEntry.imagethumb = itemEntry.imagelist[0];
-	itemEntry.coordinate = input.coordinate.split(",");
+	var cordi = input.coordinate.split(",");
+	itemEntry.coordinate = [Number(cordi[0]),Number(cordi[1])];
 	itemEntry.isrecommend = input.isrecommend;
 	if (itemEntry._id) {
 		itemEntry._id = new ObjectID(itemEntry._id);
@@ -87,7 +87,7 @@ exports.addLocation = function(input, callback){
 	var options = {
 		method: 'post',
 		host: 'graph.facebook.com',
-		path: '/me/photos?access_token='+ACCESS_TOKEN,
+		path: '/me/photos?access_token=' + ACCESS_TOKEN,
 		headers: form.getHeaders(),
 	}
 
@@ -125,10 +125,31 @@ exports.addLocation = function(input, callback){
 exports.getRecommendLocation = function(userid,callback){
 	locationDB.find({"isrecommend":"true"}).toArray(function(err,result){
 		if(err)
-			callback(null,'Can not get list location');
+			callback(err,'Can not get list location');
 		else
 			callback(null,result);
 	});
+}
+
+//--------------------------------
+// Get list location by distance
+// Param distance: distance to location
+// Param callback: funtion callback
+//--------------------------------
+exports.getLocationByDistance = function(idistance, lon, lat, callback){
+	var distance 	= parseFloat(idistance/1000);
+	var limit  		= 99;
+	var skip		= 0;
+	locationDB.find({coordinate: {$within: {$center:[[parseFloat(lon),parseFloat(lat)],distance]}}})
+					.limit(limit)
+					.skip(skip)
+					.toArray(function(err, results) {
+						if(results){
+							callback(null, results);
+						} else {
+							callback(err,null);
+						}
+					});
 }
 
 //--------------------------------
@@ -141,7 +162,7 @@ exports.getRecommendLocation = function(userid,callback){
 exports.getLocationByAddress = function(userid, country, city, callback){
 	locationDB.find({"country":country,"city":city}).toArray(function(err,result){
 		if(err)
-			callback(null,'Can not get list location');
+			callback(err,'Can not get list location');
 		else
 			callback(null,result);
 	});
@@ -155,32 +176,8 @@ exports.getLocationByAddress = function(userid, country, city, callback){
 exports.getLocation = function(locationid, callback){
 	locationDB.findOne({_id:new ObjectID(locationid)}, function(err,result){
 		if(err)
-			callback(null,'Can not get list location');
+			callback(err,'Can not get list location');
 		else
 			callback(null,result);
 	});
 }
-
-exports.picturesOpFacebookOAuthIdGET = function(req, res) {
-	//logger.info("GET /pictures/op/facebookOAuth/" + req.params.pictureId);
-
-	var client_id	 = "234435456715656";
-	var client_secret = "d2d0e0d101cb07f0b70ed2175cc066c0";
-
-	oa = new oauth.OAuth2(client_id, client_secret, "https://graph.facebook.com");
-	/*
-	res.redirect(oa.getAuthorizeUrl(
-		{
-			scope		  : "publish_stream", // Gets permission for posting to the users timeline
-			response_type : "code",
-			redirect_uri  : "http://localhost:3000/pictures/op/facebookUpload/" + req.params.pictureId
-		}
-	));
-	*/
-	oa.getOAuthAccessToken(
-	'',
-	{'grant_type':'client_credentials'},
-	function (e, access_token, refresh_token, results){
-		console.log('bearer: ',access_token);
-	});
-};
