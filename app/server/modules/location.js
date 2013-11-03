@@ -181,3 +181,31 @@ exports.getLocation = function(locationid, callback){
 			callback(null,result);
 	});
 }
+
+//--------------------------------
+// Add number comment for location
+// Param locationid: id of location
+// Param callback: funtion callback
+//--------------------------------
+exports.addLocationComment = function(locationid, callback){
+	locationDB.update({_id:new ObjectID(locationid)}, {$inc:{'comment':1}}, function(err,result){
+		if(err)
+			callback(err,'Can not add comment');
+		else
+			callback(null,result);
+	});
+}
+
+//--------------------------------
+// Add number like for location
+// Param locationid: id of location
+// Param callback: funtion callback
+//--------------------------------
+exports.addLocationLike = function(locationid, callback){
+	locationDB.update({_id:new ObjectID(locationid)}, {$inc:{'like':1}}, function(err,result){
+		if(err)
+			callback(err,'Can not add like');
+		else
+			callback(null,result);
+	});
+}

@@ -103,3 +103,13 @@ exports.addImageComment = function(imageid, callback){
 			callback(null,result);
 	});
 }
+
+// Add user favour
+exports.addUserFavaour = function(userid, imageid, callback){
+	imageDB.update( { image : imageid },{ $push: { userfavour : userid } }, function(err,result){
+		if(err)
+			callback(err,'Can not add user');
+		else
+			callback(null,result);
+	});
+}

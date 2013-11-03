@@ -574,4 +574,94 @@ module.exports = function(app,nodeuuid){
 			}
 		});
 	});
+
+	//--------------------------------
+	// Add comment for location
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/addlocationcomment',function(req,res){
+		var token = req.param('token');
+		var locationid = req.param('locationid');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.addLocationComment(locationid, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Add like for location
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/addlocationlike',function(req,res){
+		var token = req.param('token');
+		var locationid = req.param('locationid');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.addLocationLike(locationid, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Add user favour image
+	// Return: JSON image info
+	//--------------------------------
+	app.get('/adduserfavaour',function(req,res){
+		var token = req.param('token');
+		var imageid = req.param('imageid');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('AddUserFavaour', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.addUserFavaour(objects.userid, imageid, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('AddUserFavaour', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('AddUserFavaour', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('AddUserFavaour', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
 };
