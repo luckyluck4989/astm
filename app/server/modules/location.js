@@ -87,7 +87,7 @@ exports.addLocation = function(input, callback){
 	var options = {
 		method: 'post',
 		host: 'graph.facebook.com',
-		path: '/me/photos?access_token=' + ACCESS_TOKEN,
+		path: '/534081833342710/photos?access_token=' + ACCESS_TOKEN,
 		headers: form.getHeaders(),
 	}
 
@@ -205,6 +205,35 @@ exports.addLocationLike = function(locationid, callback){
 	locationDB.update({_id:new ObjectID(locationid)}, {$inc:{'like':1}}, function(err,result){
 		if(err)
 			callback(err,'Can not add like');
+		else
+			callback(null,result);
+	});
+}
+
+//--------------------------------
+// Update number comment for location
+// Param locationid: id of location
+// Param cmt: number comment
+// Param callback: funtion callback
+//--------------------------------
+exports.updateLocationComment = function(locationid, cmt, callback){
+	locationDB.update({ _id : new ObjectID(locationid) }, { $set : { comment : Number(cmt) } }, function(err,result){
+		if(err)
+			callback(err,'Can not update comment');
+		else
+			callback(null,result);
+	});
+}
+
+//--------------------------------
+// Update number like for location
+// Param nlike: number like
+// Param callback: funtion callback
+//--------------------------------
+exports.updateLocationLike = function(locationid, nlike, callback){
+	locationDB.update({ _id : new ObjectID(locationid) }, { $set : { like : Number(nlike) } }, function(err,result){
+		if(err)
+			callback(err,'Can not update like');
 		else
 			callback(null,result);
 	});

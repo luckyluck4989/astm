@@ -73,6 +73,29 @@ exports.addImage = function(userid, faceid, image, callback){
 	});
 }
 
+//--------------------------------
+// Function Add Image Face
+// Param input: List input from screen
+// Param image: image need to be upload
+// Param callback: funtion callback
+//--------------------------------
+exports.addFaceImage = function(userid, imageid, callback){
+	var iDate = new Date();
+	imageDB.insert({
+						"userid": userid,
+						"image": imageid,
+						"like": 0,
+						"comment": 0,
+						"userfavour": [],
+						"addatetime": iDate
+					},function(err,result){
+		if(err)
+			callback(err,'Can not upload image');
+		else
+			callback(null,result);
+	});
+}
+
 // Get list image whats hot
 exports.getWhatsHotImage = function(callback){
 	var iOffset = 30;
@@ -97,6 +120,26 @@ exports.addImageLike = function(imageid, callback){
 // Add comment
 exports.addImageComment = function(imageid, callback){
 	imageDB.update({'image':imageid}, {$inc:{'comment':1}}, function(err,result){
+		if(err)
+			callback(err,'Can not get list image');
+		else
+			callback(null,result);
+	});
+}
+
+// Add like image
+exports.updateImageLike = function(imageid, nlike, callback){
+	imageDB.update( {'image' : imageid }, { $set : { 'like' : Number(nlike) } }, function(err,result){
+		if(err)
+			callback(err,'Can not get list image');
+		else
+			callback(null,result);
+	});
+}
+
+// Add comment
+exports.updateImageComment = function(imageid, cmt, callback){
+	imageDB.update( { 'image' : imageid }, { $set : { 'comment' : Number(cmt) } }, function(err,result){
 		if(err)
 			callback(err,'Can not get list image');
 		else

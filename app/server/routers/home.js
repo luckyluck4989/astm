@@ -404,14 +404,14 @@ module.exports = function(app,nodeuuid){
 	app.post('/uploadimage',function(req,res){
 		var input = req.body;
 		var token = input.token;
-		var faceid = input.faceid;
+		var imageid = input.imageid;
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
 				var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
-				imageModel.addImage(objects.userid, faceid, req.files.photos, function (err, retJson) {
+				imageModel.addFaceImage(objects.userid, imageid, function (err, retJson) {
 					if (err) {
 						var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
@@ -660,6 +660,130 @@ module.exports = function(app,nodeuuid){
 				});
 			} else {
 				var jsonResult = createJsonResult('AddUserFavaour', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Update comment for location
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/updatelocationcomment',function(req,res){
+		var token = req.param('token');
+		var locationid = req.param('locationid');
+		var cmt = req.param('comment');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.updateLocationComment(locationid, cmt, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Update like for location
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/updatelocationlike',function(req,res){
+		var token = req.param('token');
+		var locationid = req.param('locationid');
+		var like = req.param('like');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.updateLocationLike(locationid, like, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Update like for image
+	// Return: JSON image info
+	//--------------------------------
+	app.get('/updateimagelike',function(req,res){
+		var token = req.param('token');
+		var imageid = req.param('imageid');
+		var like = req.param('like');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('UpdateImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.updateImageLike(imageid, like, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('UpdateImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('UpdateImageLike', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('UpdateImageLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Update comment for image
+	// Return: JSON image info
+	//--------------------------------
+	app.get('/updateimagecomment',function(req,res){
+		var token = req.param('token');
+		var imageid = req.param('imageid');
+		var cmt = req.param('comment');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('UpdateImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.updateImageComment(imageid, cmt, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('UpdateImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('UpdateImageComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
 				res.json(jsonResult, 400);
 			}
 		});
