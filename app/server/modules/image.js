@@ -81,7 +81,6 @@ exports.addImage = function(userid, faceid, image, callback){
 // Param callback: funtion callback
 //--------------------------------
 exports.addFaceImage = function(userid, imageid, callback){
-	/*
 	var query = "SELECT images, comment_info, like_info FROM photo WHERE object_id = '" + imageid + "'";
 	fql({
 		token: '565933323461608|TDMw4-yqsV1fqfdBntJD1hnRIaw'
@@ -92,15 +91,13 @@ exports.addFaceImage = function(userid, imageid, callback){
 			console.log(data); // [ { name: 'John Doe' } ]
 			var imgLike = data[0].like_info.like_count != undefined ? data[0].like_info.like_count : 0;
 			var imgCmt = data[0].comment_info.comment_count != undefined ? data[0].comment_info.comment_count : 0;
-			
-			*/
 			var iDate = new Date();
 			imageDB.insert({
 								"userid": userid,
 								"image": imageid,
-								"like": 0,
-								"comment": 0,
-								"imagesrc": '',
+								"like": imgLike,
+								"comment": imgCmt,
+								"imagesrc": data[0].images,
 								"userfavour": [],
 								"addatetime": iDate
 							},function(err,result){
@@ -109,11 +106,8 @@ exports.addFaceImage = function(userid, imageid, callback){
 				else
 					callback(null,result);
 			});
-			/*
-			callback(null,'xxx');
 		}
 	});
-	*/
 }
 
 // Get list image whats hot
