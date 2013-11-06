@@ -92,6 +92,7 @@ exports.addFaceImage = function(userid, imageid, callback){
 			var imgLike = data[0].like_info.like_count != undefined ? data[0].like_info.like_count : 0;
 			var imgCmt = data[0].comment_info.comment_count != undefined ? data[0].comment_info.comment_count : 0;
 			var iDate = new Date();
+			/*
 			imageDB.insert({
 								"userid": userid,
 								"image": imageid,
@@ -106,6 +107,8 @@ exports.addFaceImage = function(userid, imageid, callback){
 				else
 					callback(null,result);
 			});
+			*/
+			callback(null,'xxx');
 		}
 	});
 }
