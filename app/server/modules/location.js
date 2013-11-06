@@ -87,7 +87,7 @@ exports.addLocation = function(input, callback){
 	var options = {
 		method: 'post',
 		host: 'graph.facebook.com',
-		path: '/534081833342710/photos?access_token=' + ACCESS_TOKEN,
+		path: '/me/feed?access_token=' + ACCESS_TOKEN,
 		headers: form.getHeaders(),
 	}
 

@@ -2,6 +2,7 @@ var cnMongoDB = require('../mongodb/connection'),
 				ObjectID = cnMongoDB.ObjectID,
 				fs = require("fs");
 var imageDB = cnMongoDB.image;
+var fql = require('fql');
 
 // Get list image by userid
 exports.getPrivateImage = function(userid,page,offset,callback){
@@ -80,19 +81,32 @@ exports.addImage = function(userid, faceid, image, callback){
 // Param callback: funtion callback
 //--------------------------------
 exports.addFaceImage = function(userid, imageid, callback){
-	var iDate = new Date();
-	imageDB.insert({
-						"userid": userid,
-						"image": imageid,
-						"like": 0,
-						"comment": 0,
-						"userfavour": [],
-						"addatetime": iDate
-					},function(err,result){
-		if(err)
-			callback(err,'Can not upload image');
-		else
-			callback(null,result);
+	var query = "SELECT images, comment_info, like_info FROM photo WHERE object_id = '" + imageid + "'";
+	fql({
+		token: '565933323461608|TDMw4-yqsV1fqfdBntJD1hnRIaw'
+	}).query(query, function(err, data) {
+		if (err) {
+			callback(err,null)
+		} else {
+			console.log(data); // [ { name: 'John Doe' } ]
+			var imgLike = data[0].like_info.like_count != undefined ? data[0].like_info.like_count : 0;
+			var imgCmt = data[0].comment_info.comment_count != undefined ? data[0].comment_info.comment_count : 0;
+			var iDate = new Date();
+			imageDB.insert({
+								"userid": userid,
+								"image": imageid,
+								"like": imgLike,
+								"comment": imgCmt,
+								"imagesrc": data[0].images,
+								"userfavour": [],
+								"addatetime": iDate
+							},function(err,result){
+				if(err)
+					callback(err,'Can not upload image');
+				else
+					callback(null,result);
+			});
+		}
 	});
 }
 

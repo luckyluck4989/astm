@@ -40,7 +40,7 @@ function createJsonResult(func,mthod,stt,msg,err,res){
 	return jsonResult;
 }
 
-module.exports = function(app,nodeuuid){
+module.exports = function(app, nodeuuid){
 	app.get('/',function(req,res){
 		res.render('block/admin', { title: 'Admin Page' });
 	});
