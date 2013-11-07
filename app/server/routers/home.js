@@ -405,13 +405,14 @@ module.exports = function(app, nodeuuid){
 		var input = req.body;
 		var token = input.token;
 		var imageid = input.imageid;
+		var desc = input.description;
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
 				var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
-				imageModel.addFaceImage(objects.userid, imageid, function (err, retJson) {
+				imageModel.addFaceImage(objects.userid, imageid, desc, function (err, retJson) {
 					if (err) {
 						var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
@@ -784,6 +785,66 @@ module.exports = function(app, nodeuuid){
 				});
 			} else {
 				var jsonResult = createJsonResult('AddImageComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Delete image
+	// Return: JSON image info
+	//--------------------------------
+	app.get('/deleteimage',function(req,res){
+		var token = req.param('token');
+		var imageid = req.param('imageid');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('DeleteImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.deleteImage(imageid, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('DeleteImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('DeleteImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('DeleteImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Delete location
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/deletelocation',function(req,res){
+		var token = req.param('token');
+		var locationid = req.param('locationid');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.deleteLocation(locationid, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
 				res.json(jsonResult, 400);
 			}
 		});

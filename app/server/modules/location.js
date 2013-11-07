@@ -238,3 +238,17 @@ exports.updateLocationLike = function(locationid, nlike, callback){
 			callback(null,result);
 	});
 }
+
+//--------------------------------
+// Delete location
+// Param nlike: number like
+// Param callback: funtion callback
+//--------------------------------
+exports.deleteLocation = function(locationid, callback){
+	locationDB.remove({ _id : new ObjectID(locationid) }, function(err,result){
+		if(err)
+			callback(err,'Can not delete location');
+		else
+			callback(null,result);
+	});
+}

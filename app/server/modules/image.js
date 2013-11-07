@@ -80,7 +80,7 @@ exports.addImage = function(userid, faceid, image, callback){
 // Param image: image need to be upload
 // Param callback: funtion callback
 //--------------------------------
-exports.addFaceImage = function(userid, imageid, callback){
+exports.addFaceImage = function(userid, imageid, desc, callback){
 	var query = "SELECT images, comment_info, like_info FROM photo WHERE object_id = '" + imageid + "'";
 	fql({
 		token: '565933323461608|TDMw4-yqsV1fqfdBntJD1hnRIaw'
@@ -88,7 +88,6 @@ exports.addFaceImage = function(userid, imageid, callback){
 		if (err) {
 			callback(err,null)
 		} else {
-			console.log(data); // [ { name: 'John Doe' } ]
 			var imgLike = data[0].like_info.like_count != undefined ? data[0].like_info.like_count : 0;
 			var imgCmt = data[0].comment_info.comment_count != undefined ? data[0].comment_info.comment_count : 0;
 			var iDate = new Date();
@@ -97,6 +96,7 @@ exports.addFaceImage = function(userid, imageid, callback){
 								"image": imageid,
 								"like": imgLike,
 								"comment": imgCmt,
+								"description": desc,
 								"imagesrc": data[0].images,
 								"userfavour": [],
 								"addatetime": iDate
@@ -166,6 +166,16 @@ exports.addUserFavaour = function(userid, imageid, callback){
 	imageDB.update( { image : imageid },{ $push: { userfavour : userid } }, function(err,result){
 		if(err)
 			callback(err,'Can not add user');
+		else
+			callback(null,result);
+	});
+}
+
+// Delete image
+exports.deleteImage = function(imageid, callback){
+	imageDB.remove( { image : imageid }, function(err,result){
+		if(err)
+			callback(err,'Can not delete image');
 		else
 			callback(null,result);
 	});
