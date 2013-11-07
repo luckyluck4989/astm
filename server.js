@@ -22,9 +22,11 @@ var express = require('express')
 **/
 nconf.env().file({ file: 'settings.json' });
 
+
+
 var app = express();
 app.configure(function () {
-    app.set('port', process.env.PORT || 3000);
+    app.set('port', process.env.PORT || 3009);
     app.set('views', __dirname + '/app/server/views');
     app.set('view engine', 'jade');
     app.use(express.favicon());
@@ -50,7 +52,6 @@ app.configure(function () {
 		res.send(200,jsonResult);
 	});
 	*/
-
 });
 
 app.configure('development', function () {
