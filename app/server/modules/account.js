@@ -1,10 +1,12 @@
 var cnMongoDB = require('../mongodb/connection');
 var accountDB = cnMongoDB.account;
 var systemDB  = cnMongoDB.systemstatus;
+var crypto = require('crypto');
 
 // Check user & password when login
 exports.checkLogin = function(userid,password,callback){
-	accountDB.findOne({$and:[{"userid":userid,"password":password}]},function(err,result){
+	var pword = crypto.createHash('md5').update(password).digest("hex");
+	accountDB.findOne({$and:[{"userid":userid,"password":pword}]},function(err,result){
 		if(err)
 			callback(err,'Can not login');
 		else
@@ -56,10 +58,11 @@ exports.getUserInfo = function(userid,callback){
 // Add user
 exports.addUser = function(userid,password,email,callback){
 	// account{name,userid,password,email,country,favour_food,favour_location,notes,registerdate}
+	var pword = crypto.createHash('md5').update(password).digest("hex");
 	var iDate = new Date();
 	accountDB.insert({"name":"",
 					"userid":userid,
-					"password":password,
+					"password":pword,
 					"email":email,
 					"country":"Viet Nam",
 					"favour_food":"",
@@ -69,6 +72,30 @@ exports.addUser = function(userid,password,email,callback){
 					},function(err,result){
 		if(err)
 			callback(err,'Can not register user');
+		else
+			callback(null,result);
+	});
+}
+
+// Update comment and like
+exports.updateUserInfo = function(userid,
+								  iname,
+								  ipass,
+								  iemail,
+								  icountry,
+								  ifood,
+								  ilocation,
+								  inotes, callback){
+	var pword = crypto.createHash('md5').update(ipass).digest("hex");
+	accountDB.update( { 'userid' : userid }, { $set : { name : iname,
+													  password : pword,
+													  email: iemail,
+													  country: icountry,
+													  favour_food: ifood,
+													  favour_location: ilocation,
+													  notes: inotes} }, function(err,result){
+		if(err)
+			callback(err,'Can not update user');
 		else
 			callback(null,result);
 	});
