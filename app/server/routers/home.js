@@ -962,4 +962,35 @@ module.exports = function(app, nodeuuid){
 			}
 		});
 	});
+
+	//--------------------------------
+	// Get Favourite Image
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/getfavouriteimage',function(req,res){
+		var token = req.param('token');
+		var page = req.param('page');
+		var offset = req.param('offset');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('GetFavouriteImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.getFavouriteImage(objects.userid, page, offset, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('GetFavouriteImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('GetFavouriteImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('GetFavouriteImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
 };

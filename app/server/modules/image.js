@@ -191,3 +191,15 @@ exports.updateImageLikeComment = function(imageid, nlike, ncomment, callback){
 			callback(null,result);
 	});
 }
+
+// Get list favourite image by userid
+exports.getFavouriteImage = function(userid,page,offset,callback){
+	var iSkip = (page - 1)* offset;
+	var iOffset = page * offset;
+	imageDB.find( { userfavour: userid } ).skip(iSkip).limit(iOffset).toArray(function(err,result){
+		if(err)
+			callback(err,'Can not get list image');
+		else
+			callback(null,result);
+	});
+}
