@@ -5,7 +5,7 @@ var MongoDb = require("mongodb");
 var locationDB = cnMongoDB.location;
 var https = require('https'); //Https module of Node.js
 var FormData = require('form-data'); //Pretty multipart form maker.
-var ACCESS_TOKEN = "CAAICtp62IZBgBAIZAtT14faF6niwKWrXL9geaZCq4JGUMeXvPbe7AvryLkSVZCfiRoNRbgk6zsUX2oBsmeldZA1FRaQS7S3aFV4Ax3t6TSqlhXA7xY4Wannzo9Ldt5VP2NYctCWuZCbx5r5cvGlZCwz5VxBZAx4X8sP2E0sJ9AaMZBbyIgtsuDiidxcRVrZCbp4E4ZD";
+var ACCESS_TOKEN = "CAAICtp62IZBgBAFQfuu4IUZB38VVcVAb9BvErVoJIUpHagRrSNZBbPSsEMDkZAcNI85lvTwVJGV9IxvSELXUOWRGcrIZAnSnrNcmkrCEbnPZAxkuQNvVeP7Dq8oGXSTSs223HTWbB9eh2FarKxJHTV8VICI9DtaRtKpZAOTk5IwDsypL6Yr9QYAkKyZCmGCwwPEZD";
 
 //--------------------------------
 // Function Add Image
@@ -87,7 +87,7 @@ exports.addLocation = function(input, callback){
 	var options = {
 		method: 'post',
 		host: 'graph.facebook.com',
-		path: '/me/feed?access_token=' + ACCESS_TOKEN,
+		path: '/534081833342710/photos?access_token=' + ACCESS_TOKEN,
 		headers: form.getHeaders(),
 	}
 
@@ -248,6 +248,22 @@ exports.deleteLocation = function(locationid, callback){
 	locationDB.remove({ _id : new ObjectID(locationid) }, function(err,result){
 		if(err)
 			callback(err,'Can not delete location');
+		else
+			callback(null,result);
+	});
+}
+
+//--------------------------------
+// Update number like and comment for location
+// Param nlike: number like
+// Param ncomment: number comment
+// Param callback: funtion callback
+//--------------------------------
+exports.updateLocationLikeComment = function(locationid, nlike, ncomment, callback){
+	locationDB.update({ _id : new ObjectID(locationid) }, 
+					  { $set : { like : Number(nlike), comment : Number(ncomment) } }, function(err,result){
+		if(err)
+			callback(err,'Can not update');
 		else
 			callback(null,result);
 	});

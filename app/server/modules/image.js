@@ -180,3 +180,13 @@ exports.deleteImage = function(imageid, callback){
 			callback(null,result);
 	});
 }
+
+// Update comment and like
+exports.updateImageLikeComment = function(imageid, nlike, ncomment, callback){
+	imageDB.update( { 'image' : imageid }, { $set : { like : Number(nlike), comment : Number(ncomment) } }, function(err,result){
+		if(err)
+			callback(err,'Can not update image');
+		else
+			callback(null,result);
+	});
+}

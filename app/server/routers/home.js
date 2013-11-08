@@ -849,4 +849,70 @@ module.exports = function(app, nodeuuid){
 			}
 		});
 	});
+
+	//--------------------------------
+	// Update comment and like for location
+	// Return: JSON location info
+	//--------------------------------
+	app.post('/updatelocationlikecomment',function(req,res){
+		var input = req.body;
+		var token = input.token;
+		var locationid = input.locationid;
+		var nlike = input.like;
+		var ncomment = input.comment;
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.updateLocationLikeComment(locationid, nlike, ncomment, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Update comment and like for image
+	// Return: JSON image info
+	//--------------------------------
+	app.post('/updateimagelikecomment',function(req,res){
+		var input = req.body;
+		var token = input.token;
+		var imageid = input.imageid;
+		var nlike = input.like;
+		var ncomment = input.comment;
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('UpdateImageLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.updateImageLikeComment(imageid, nlike, ncomment, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('UpdateImageLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('UpdateImageLikeComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('UpdateImageLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
 };
