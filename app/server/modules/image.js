@@ -80,7 +80,7 @@ exports.addImage = function(userid, faceid, image, callback){
 // Param image: image need to be upload
 // Param callback: funtion callback
 //--------------------------------
-exports.addFaceImage = function(userid, imageid, desc, callback){
+exports.addFaceImage = function(userid, imageid, desc, title, callback){
 	var query = "SELECT images, comment_info, like_info FROM photo WHERE object_id = '" + imageid + "'";
 	fql({
 		token: '565933323461608|TDMw4-yqsV1fqfdBntJD1hnRIaw'
@@ -96,6 +96,7 @@ exports.addFaceImage = function(userid, imageid, desc, callback){
 								"image": imageid,
 								"like": imgLike,
 								"comment": imgCmt,
+								"title": title,
 								"description": desc,
 								"imagesrc": data[0].images,
 								"userfavour": [],

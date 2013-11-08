@@ -405,6 +405,7 @@ module.exports = function(app, nodeuuid){
 		var input = req.body;
 		var token = input.token;
 		var imageid = input.imageid;
+		var title = input.title;
 		var desc = input.description;
 		accountModel.checkToken(token, function (err, objects) {
 			if (err) {
@@ -412,7 +413,7 @@ module.exports = function(app, nodeuuid){
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
-				imageModel.addFaceImage(objects.userid, imageid, desc, function (err, retJson) {
+				imageModel.addFaceImage(objects.userid, imageid, desc, title, function (err, retJson) {
 					if (err) {
 						var jsonResult = createJsonResult('UploadImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
 						res.json(jsonResult, 400);
