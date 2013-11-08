@@ -5,8 +5,7 @@ var crypto = require('crypto');
 
 // Check user & password when login
 exports.checkLogin = function(userid,password,callback){
-	var pword = crypto.createHash('md5').update(password).digest("hex");
-	accountDB.findOne({$and:[{"userid":userid,"password":pword}]},function(err,result){
+	accountDB.findOne({$and:[{"userid":userid,"password":password}]},function(err,result){
 		if(err)
 			callback(err,'Can not login');
 		else
