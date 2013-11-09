@@ -1128,4 +1128,66 @@ module.exports = function(app, nodeuuid){
 			}
 		});
 	});
+
+	//--------------------------------
+	// Get Image Best Like
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/getimagelikest',function(req,res){
+		var token = req.param('token');
+		var page = req.param('page');
+		var offset = req.param('offset');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('GetImageLikest', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.getImageLikest(page, offset, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('GetImageLikest', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('GetImageLikest', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('GetImageLikest', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Get Image Newest
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/getimagenewest',function(req,res){
+		var token = req.param('token');
+		var page = req.param('page');
+		var offset = req.param('offset');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('GetImageNewest', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				imageModel.getImageNewest(page, offset, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('GetImageNewest', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('GetImageNewest', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('GetImageNewest', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
 };
