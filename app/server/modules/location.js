@@ -57,6 +57,7 @@ exports.addLocation = function(input, callback){
 						isrecommend: '',
 						description: '',
 						imagelist: [],
+						checkin: [],
 						imagethumb: '',
 						coordinate: [],
 						like: 0,
@@ -264,6 +265,37 @@ exports.updateLocationLikeComment = function(locationid, nlike, ncomment, callba
 					  { $set : { like : Number(nlike), comment : Number(ncomment) } }, function(err,result){
 		if(err)
 			callback(err,'Can not update');
+		else
+			callback(null,result);
+	});
+}
+
+
+//--------------------------------
+// Add user checkin
+// Param userid: user checkin
+// Param callback: funtion callback
+//--------------------------------
+exports.checkinLocation = function(userid, locationid, callback){
+	locationDB.update( { _id : new ObjectID(locationid) },{ $push: { checkin : userid } }, function(err,result){
+		if(err)
+			callback(err,'Can not add user checkin');
+		else
+			callback(null,result);
+	});
+}
+
+//--------------------------------
+// Get checkin location
+// Param userid: user checkin
+// Param callback: funtion callback
+//--------------------------------
+exports.getCheckinLocation = function(userid,page,offset,callback){
+	var iSkip = (page - 1)* offset;
+	var iOffset = page * offset;
+	locationDB.find( { checkin: userid } ).skip(iSkip).limit(iOffset).toArray(function(err,result){
+		if(err)
+			callback(err,'Can not get list image');
 		else
 			callback(null,result);
 	});

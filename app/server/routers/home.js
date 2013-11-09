@@ -993,4 +993,69 @@ module.exports = function(app, nodeuuid){
 			}
 		});
 	});
+
+	//--------------------------------
+	// Check in location
+	// Return: JSON image info
+	//--------------------------------
+	app.post('/checkinlocation',function(req,res){
+		var input	  = req.body;
+		var token	  = input.token;
+		var locationid = input.locationid;
+
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.checkinLocation(
+					objects.userid,
+					locationid, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Get CheckinLocation
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/getcheckinlocation',function(req,res){
+		var token = req.param('token');
+		var page = req.param('page');
+		var offset = req.param('offset');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('GetCheckinLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				locationModel.getCheckinLocation(objects.userid, page, offset, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('GetCheckinLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('GetCheckinLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('GetCheckinLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
 };
