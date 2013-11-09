@@ -93,6 +93,7 @@ exports.addFaceImage = function(userid, imageid, desc, title, callback){
 			var iDate = new Date();
 			imageDB.insert({
 								"userid": userid,
+								"username": '',
 								"image": imageid,
 								"like": imgLike,
 								"comment": imgCmt,
@@ -221,6 +222,18 @@ exports.getImageNewest = function(page, offset, callback){
 	var iSkip = (page - 1)* offset;
 	var iOffset = page * offset;
 	imageDB.find({}).sort([['addatetime','desc']]).skip(iSkip).limit(iOffset).toArray(function(err,result){
+		if(err)
+			callback(err,'Can not get list image');
+		else
+			callback(null,result);
+	});
+}
+
+// Get list image newest
+exports.getImageRandom = function(page, offset, callback){
+	var iSkip = (page - 1)* offset;
+	var iOffset = page * offset;
+	imageDB.find({}).sort([['image','desc']]).skip(iSkip).limit(iOffset).toArray(function(err,result){
 		if(err)
 			callback(err,'Can not get list image');
 		else
