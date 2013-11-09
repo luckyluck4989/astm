@@ -66,6 +66,7 @@ exports.addUser = function(userid,password,email,callback){
 					"country":"Viet Nam",
 					"favour_food":"",
 					"favour_location":"",
+					"point": 0,
 					"notes":"",
 					registerdate:iDate
 					},function(err,result){

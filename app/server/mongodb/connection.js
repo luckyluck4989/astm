@@ -36,6 +36,8 @@ module.exports = {
 		country:db.collection('country'),
 		city:db.collection('city'),
 		systemstatus:db.collection('systemstatus'),
+		paramsetting:db.collection('paramsetting'),
+		userhistory:db.collection('userhistory'),
 		crypto:crypto,
 		ObjectID:ObjectID,
 		moment:moment 

@@ -5,7 +5,7 @@ var MongoDb = require("mongodb");
 var locationDB = cnMongoDB.location;
 var https = require('https'); //Https module of Node.js
 var FormData = require('form-data'); //Pretty multipart form maker.
-var ACCESS_TOKEN = "CAAICtp62IZBgBAFQfuu4IUZB38VVcVAb9BvErVoJIUpHagRrSNZBbPSsEMDkZAcNI85lvTwVJGV9IxvSELXUOWRGcrIZAnSnrNcmkrCEbnPZAxkuQNvVeP7Dq8oGXSTSs223HTWbB9eh2FarKxJHTV8VICI9DtaRtKpZAOTk5IwDsypL6Yr9QYAkKyZCmGCwwPEZD";
+var ACCESS_TOKEN = "CAAICtp62IZBgBAOvQgqSBXZCSjkTEMJ9wyLrD5a3vQQRAD371nq6THCrCNGyPgV5fQxaI7RZBTyPgNXK92EDZAw0LVzfmph0BJX3hTiipiw8ZC8xw7X51klrhadSOtGb84EzNOxGQaVwWIanm6FdFZBTmHGw1dR5FRdbHwTfxiGU3N5OVzSv3yUwa1zRqrqBgZD";
 
 //--------------------------------
 // Function Add Image

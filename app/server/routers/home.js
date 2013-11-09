@@ -1,6 +1,7 @@
 var accountModel = require('../modules/account')
 var locationModel = require('../modules/location')
 var imageModel = require('../modules/image')
+var userHistoryModel = require('../modules/userhistory')
 var geogModel = require('../modules/geog')
 
 //--------------------------------
@@ -1054,6 +1055,75 @@ module.exports = function(app, nodeuuid){
 				});
 			} else {
 				var jsonResult = createJsonResult('GetCheckinLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Add point
+	// Return: JSON image info
+	//--------------------------------
+	app.post('/addpoint',function(req,res){
+		var input		= req.body;
+		var token		= input.token;
+		var objectid	= input.objectid;
+		var objecttype	= input.objecttype;
+		var pointtype	= input.pointtype;
+
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('AddPoint', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				userHistoryModel.addPoint(
+					objects.userid,
+					objectid,
+					objecttype,
+					pointtype, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('AddPoint', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('AddPoint', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('AddPoint', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+				res.json(jsonResult, 400);
+			}
+		});
+	});
+
+	//--------------------------------
+	// Get History
+	// Return: JSON location info
+	//--------------------------------
+	app.get('/getpointhistory',function(req,res){
+		var token = req.param('token');
+		var page = req.param('page');
+		var offset = req.param('offset');
+		accountModel.checkToken(token, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('GetPointHistory', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				userHistoryModel.getPointHistory(objects.userid, page, offset, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('GetPointHistory', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('GetPointHistory', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+						res.json(jsonResult,200);
+					}
+				});
+			} else {
+				var jsonResult = createJsonResult('GetPointHistory', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
 				res.json(jsonResult, 400);
 			}
 		});
