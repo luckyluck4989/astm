@@ -16,11 +16,19 @@ exports.checkLogin = function(userid,password,callback){
 // Create token
 exports.insertToken = function(userid,token,callback){
 	var iDate = new Date();
-	systemDB.insert({"token":token,"userid":userid,"lastedit":iDate},function(err,result){
-		if(err)
+	systemDB.insert({"token":token,"userid":userid,"lastedit":iDate},function(err,resultSystem){
+		if(err){
 			callback(err,'Can not login');
-		else
-			callback(null,result);
+		} else {
+			accountDB.findOne({"userid":userid},function(err,resultAcc){
+				if(err){
+					callback(err,'Can not get user info');
+				} else {
+					resultSystem[0].point = resultAcc.point;
+					callback(null,resultSystem);
+				}
+			});
+		}
 	});
 }
 
@@ -86,9 +94,8 @@ exports.updateUserInfo = function(userid,
 								  ifood,
 								  ilocation,
 								  inotes, callback){
-	var pword = crypto.createHash('md5').update(ipass).digest("hex");
 	accountDB.update( { 'userid' : userid }, { $set : { name : iname,
-													  password : pword,
+													  password : ipass,
 													  email: iemail,
 													  country: icountry,
 													  favour_food: ifood,

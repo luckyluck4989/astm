@@ -3,6 +3,7 @@ var cnMongoDB = require('../mongodb/connection'),
 				fs = require("fs");
 var MongoDb = require("mongodb");
 var locationDB = cnMongoDB.location;
+var accountDB = cnMongoDB.account;
 var https = require('https'); //Https module of Node.js
 var FormData = require('form-data'); //Pretty multipart form maker.
 var ACCESS_TOKEN = "CAAICtp62IZBgBAFBWLnjZAf63Vtt8W6zpXNZALqi2Pd6Fuisl0dfkE5w6HjZBSyLfj99NlaETUZBSJtELdtySHy00R1Ls7bXNtDZBL3IMRtnZBIgx1NZCV0RtTulGSPld0hGwGxFu4oICjfdMQVbph7ig3ZA72j3XPS59qu8JZCYC615bXLcp2mauEc0NpxSXKg0wqgjW27zdvpQZDZD";
@@ -277,11 +278,24 @@ exports.updateLocationLikeComment = function(locationid, nlike, ncomment, callba
 // Param callback: funtion callback
 //--------------------------------
 exports.checkinLocation = function(userid, locationid, callback){
-	locationDB.update( { _id : new ObjectID(locationid) },{ $push: { checkin : userid } }, function(err,result){
-		if(err)
+	locationDB.update( { _id : new ObjectID(locationid) },{ $push: { checkin : userid } }, function(err,resultUpdate){
+		if(err){
 			callback(err,'Can not add user checkin');
-		else
-			callback(null,result);
+		} else {
+			locationDB.findOne({_id:new ObjectID(locationid)}, function(err,resultFind){
+				if(err) {
+					callback(err,'Can not get location');
+				} else {
+					accountDB.update( { 'userid' : userid }, { $set : { lastcheckinid : resultFind._id,
+																		lastcheckinname : resultFind.namelocation } }, function(err,result){
+						if(err)
+							callback(err,'Can not update user');
+						else
+							callback(null,result);
+					});
+				}
+			});
+		}
 	});
 }
 
