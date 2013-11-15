@@ -71,6 +71,7 @@ function drawData(dataJson){
 		tmpRow += '				</div>'
 		tmpRow += '			</td>'
 		tmpRow += '		</tr>';
+
 		$("#locationtbl tbody").append(tmpRow);
 	}
 }
