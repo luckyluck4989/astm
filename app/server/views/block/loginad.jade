@@ -1,0 +1,32 @@
+extends ../layout
+
+block loginad
+	.login-page
+		.login-wrapper
+			form#form-login(action="/signup", method="POST", enctype="multipart/form-data", id="loginForm")
+				h3 Login to your account
+				hr
+				.form-group
+					.controls
+						input.form-control(type='text', placeholder='Username', name='txtUserName')
+						span.help-block(for='email', style='color: #b94a48;display:none', id='invalidUserName') Please enter a valid Username.
+				.form-group
+					.controls
+						input.form-control(type='password', placeholder='Password', name='txtPassword')
+						span.help-block(for='email', style='color: #b94a48;display:none', id='invalidPassword') Please enter a valid Password.
+				.form-group
+					.controls
+						label.checkbox
+							input(type='checkbox', value='remember', name ='cbRemember')
+							| Remember me
+				.form-group
+					.controls
+						button.btn.btn-primary.form-control(type='submit',id = "btnLogin") Sign In
+				hr
+				p.clearfix
+					a.goto-forgot.pull-left(href='/forgotpass') Forgot Password?
+block scripts
+	//script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+	script(src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places")
+	script(src='/vendor/jquery.form.js')
+	script(src='/javascripts/loginad.js')

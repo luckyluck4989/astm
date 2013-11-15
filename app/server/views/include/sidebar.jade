@@ -1,24 +1,125 @@
-#sidebar.navbar-collapse collapse
-	ul(class="nav nav-list", style="height: auto;")
+#sidebar.navbar-collapse.collapse
+	ul.nav.nav-list(style='height: auto;')
 		li
-			form(target="#", method="GET", class="search-form")
-				span(class="search-pan")
-					button(type="submit")
-						i(class="icon-search")
-							input(type="text", name="search", placeholder="Search ...", autocomplete="off")
-		li(class="active")
-			a(href="/home")
-				i(class="icon-dashboard")
-					span Dashboard
+			form.search-form(target='#', method='GET')
+				span.search-pan
+					button(type='submit')
+						i.icon-search
+					input(type='text', name='search', placeholder='Search ...', autocomplete='off')
 		li
-			a(href="")
-				i(class="icon-text-width")
+			a(href='/home')
+				i.icon-dashboard
+				span Dashboard
+		li
+			a(href='typography.html')
+				i.icon-text-width
 				span Typography
 		li
-			a(href="")
-				i(class="icon-text-width")
-				span Hai pro
+			a(href='/listlocation')
+				i.icon-desktop
+				span List Location
+			ul.submenu
+				li
+					a(href='ui_general.html') General
+				li
+					a(href='ui_button.html') Button
+				li
+					a(href='ui_slider.html') Slider
+				li
+					a(href='ui_tile.html') Tile
+				li
+					a(href='ui_timeline.html') Timeline
+				li
+					a(href='ui_chart.html') Chart
+				li
+					a(href='ui_message.html') Conversation
+				li
+					a(href='ui_icon.html') Icon
 		li
-			a(href="")
-				i(class="icon-text-width")
-				span Cateogry
+			a.dropdown-toggle(href='#')
+				i.icon-edit
+				span Forms
+				b.arrow.icon-angle-right
+			ul.submenu
+				li
+					a(href='form_layout.html') Layout
+				li
+					a(href='form_component.html') Component
+				li
+					a(href='form_wizard.html') Wizard
+				li
+					a(href='form_validation.html') Validation
+		li.active
+			a.dropdown-toggle(href='#')
+				i.icon-list
+				span Tables
+				b.arrow.icon-angle-down
+			ul.submenu
+				li
+					a(href='table_basic.html') Basic
+				li.active
+					a(href='table_advance.html') Advance
+				li
+					a(href='table_dynamic.html') Dynamic
+		li
+			a.dropdown-toggle(href='#')
+				i.icon-globe
+				span Maps
+				b.arrow.icon-angle-right
+			ul.submenu
+				li
+					a(href='map_google.html') Google Maps
+				li
+					a(href='map_vector.html') Vector Maps
+		li
+			a(href='box.html')
+				i.icon-list-alt
+				span Box
+		li
+			a(href='calendar.html')
+				i.icon-calendar
+				span Calendar
+		li
+			a(href='gallery.html')
+				i.icon-picture
+				span Gallery
+		li
+			a(href='grid.html')
+				i.icon-th
+				span Griding System
+		li
+			a.dropdown-toggle(href='#')
+				i.icon-file-text-alt
+				span Sample Pages
+				b.arrow.icon-angle-right
+			ul.submenu
+				li
+					a(href='extra_login.html') Login & Register
+				li
+					a(href='extra_profile.html') User Profile
+				li
+					a(href='extra_invoice.html') Invoice
+				li
+					a(href='extra_search.html') Search Results
+		li
+			a.dropdown-toggle(href='#')
+				i.icon-file
+				span Other Pages
+				b.arrow.icon-angle-right
+			ul.submenu
+				li
+					a(href='more_blank.html') Blank Page
+				li
+					a(href='more_full-width.html') Full Width Page
+				li
+					a(href='more_error-404.html') Error 404
+				li
+					a(href='more_error-500.html') Error 500
+				li
+					a(href='more_set-skin.html') Skin
+				li
+					a(href='more_set-sidebar-navbar-color.html') Sidebar & Navbar
+				li
+					a(href='more_sidebar-collapsed.html') Collapsed Sidebar
+	#sidebar-collapse.visible-lg
+		i.icon-double-angle-left

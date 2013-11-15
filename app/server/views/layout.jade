@@ -23,9 +23,13 @@ html
 	script(src='/vendor/bootstrap.min.js')
 	script(src='/vendor/flaty.js')
 body
-	include include/header
-	#main-container.container
-		include include/sidebar
-		#main-content
-			block content
-			block scripts
+	- if(path === '/loginad')
+		block loginad
+		block scripts
+	- else
+		include include/header
+		#main-container.container
+			include include/sidebar
+			#main-content
+				block content
+				block scripts

@@ -314,3 +314,19 @@ exports.getCheckinLocation = function(userid,page,offset,callback){
 			callback(null,result);
 	});
 }
+
+//--------------------------------
+// Get list  location
+// Param userid: current user
+// Param callback: funtion callback
+//--------------------------------
+exports.getListLocation = function(page,offset,callback){
+	var iSkip = (page - 1)* offset;
+	var iOffset = page * offset;
+	locationDB.find({}).sort([['_id','desc']]).skip(iSkip).limit(iOffset).toArray(function(err,result){
+		if(err)
+			callback(err,'Can not get list location');
+		else
+			callback(null,result);
+	});
+}

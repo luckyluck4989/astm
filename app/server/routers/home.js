@@ -42,22 +42,81 @@ function createJsonResult(func,mthod,stt,msg,err,res){
 }
 
 module.exports = function(app, nodeuuid){
+	//------------------------------------------------------------------
+	// ADMIN
+	//------------------------------------------------------------------
 	app.get('/',function(req,res){
 		res.render('block/admin', { title: 'Admin Page' });
 	});
 
 	app.get('/home',function(req,res){
-		res.render('block/location', { title: 'Admin Page' });
+		res.render('block/location', { title: 'Admin Page', path: req.path });
 	});
 
 	app.get('/admin',function(req,res){
 		res.render('block/admin', { title: 'Admin Page' });
 	});
 
-	//--------------------------------
+	app.get('/listlocation',function(req,res){
+		var page = 1;
+		var offset = 10;
+		locationModel.getListLocation(page, offset, function (err, retJson) {
+			if (err) {
+				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else {
+				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+				res.render('block/listlocation', { title: 'List Location', path : req.path, resultJson : jsonResult });
+			}
+		});
+	});
+
+	app.post('/listlocation',function(req,res){
+		var input = req.body;
+		var page = input.page;
+		var offset = 10;
+		locationModel.getListLocation(page, offset, function (err, retJson) {
+			if (err) {
+				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else {
+				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+				res.json(jsonResult, 200);
+			}
+		});
+	});
+
+	app.get('/loginad',function(req,res){
+		res.render('block/loginad', { title: 'List Location', path: req.path, correct : 1 });
+	});
+
+	app.post('/signup',function(req,res){
+		var input = req.body;
+		var userid = input.txtUserName;
+		var password = input.txtPassword;
+		console.log(userid);
+		accountModel.checkLogin(userid, password, function (err, objects) {
+			if (err) {
+				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
+				res.json(jsonResult, 400);
+				return;
+			} else if(objects != null && objects.userid != undefined ){
+				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, objects);
+				res.json(jsonResult, 200);
+			} else {
+				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, MSG_LOGINFAIL, null);
+				res.json(jsonResult, 200);
+			}
+		});
+	});
+
+	//------------------------------------------------------------------
+	// API
 	// Add location event
 	// Return: When upload image Then Return list Image Name
-	//--------------------------------
+	//------------------------------------------------------------------
 	app.post('/addloca',function(req,res){
 		//--------------------------------
 		// Define parameter

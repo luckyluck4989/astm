@@ -1,47 +1,160 @@
 #navbar.navbar
-	
-	button(type="button", class="navbar-toggle navbar-btn collapsed", data-toggle="collapse", data-target="#sidebar")
-		span(class="icon-reorder")
-	a(class="navbar-brand", href="#")
+	button.navbar-toggle.navbar-btn.collapsed(type='button', data-toggle='collapse', data-target='#sidebar')
+		span.icon-reorder
+	a.navbar-brand(href='#')
 		small
-			i(class="icon-desktop")
-			| &nbsp;FLATY Admin
-	ul(class="nav flaty-nav pull-right")
-		li(class="hidden-xs")
-			a(data-toggle="dropdown", class="dropdown-toggle", href="#")
-				i(class="icon-tasks")
-				span(class="badge badge-warning") 4
-		li(class="user-profile")
-			a(data-toggle="dropdown", href="#", class="user-menu dropdown-toggle")
-				img(class="nav-user-photo", src="images/avatar1.jpg", alt="Penny's Photo")
-				span(class="hidden-sm", id="user_info") Penny
-				i(class="icon-caret-down")
-			ul(class="dropdown-menu dropdown-navbar", id="user_menu")
-				li(class="nav-header")
-					i(class="icon-time") Logined From 20:45
+			i.icon-desktop
+			|  FLATY Admin
+	ul.nav.flaty-nav.pull-right
+		li.hidden-xs
+			a.dropdown-toggle(data-toggle='dropdown', href='#')
+				i.icon-tasks
+				span.badge.badge-warning 4
+			ul.dropdown-navbar.dropdown-menu
+				li.nav-header
+					i.icon-ok
+					| 4 Tasks to complete
 				li
-					a(href="#")
-						i(class="icon-cog") Account Settings
+					a(href='#')
+						.clearfix
+							span.pull-left Software Update
+							span.pull-right 75%
+						.progress.progress-mini
+							.progress-bar.progress-bar-warning(style='width:75%')
 				li
-					a(href="#")
-						i(class="icon-user") Edit Profile
+					a(href='#')
+						.clearfix
+							span.pull-left Transfer To New Server
+							span.pull-right 45%
+						.progress.progress-mini
+							.progress-bar.progress-bar-danger(style='width:45%')
 				li
-					a(href="#")
-						i(class="icon-question") Help
-				li(class="divider visible-sm")
-				li(class="visible-sm")
-					a(href="#")
-						i(class="icon-tasks")Tasks
-						span(class="badge badge-warning")4
-				li(class="visible-sm")
-					a(href="#")
-						i(class="icon-bell-alt") Notifications
-						span(class="badge badge-important")8
-				li(class="visible-sm")
-					a(href="#")
-						i(class="icon-envelope") Messages
-						span(class="badge badge-success")5
-				li(class="divider")
+					a(href='#')
+						.clearfix
+							span.pull-left Bug Fixes
+							span.pull-right 20%
+						.progress.progress-mini
+							.progress-bar(style='width:20%')
 				li
-					a(href="#")
-						i(class="icon-off") Logout
+					a(href='#')
+						.clearfix
+							span.pull-left Writing Documentation
+							span.pull-right 85%
+						.progress.progress-mini.progress-striped.active
+							.progress-bar.progress-bar-success(style='width:85%')
+				li.more
+					a(href='#') See tasks with details
+		li.hidden-xs
+			a.dropdown-toggle(data-toggle='dropdown', href='#')
+				i.icon-bell-alt.anim-swing
+				span.badge.badge-important 5
+			ul.dropdown-navbar.dropdown-menu
+				li.nav-header
+					i.icon-warning-sign
+					| 5 Notifications
+				li.notify
+					a(href='#')
+						i.icon-comment.orange
+						p New Comments
+						span.badge.badge-warning 4
+				li.notify
+					a(href='#')
+						i.icon-twitter.blue
+						p New Twitter followers
+						span.badge.badge-info 7
+				li.notify
+					a(href='#')
+						img(src='img/demo/avatar/avatar2.jpg', alt='Alex')
+						p David would like to become moderator.
+				li.notify
+					a(href='#')
+						i.icon-bug.pink
+						p New bug in program!
+				li.notify
+					a(href='#')
+						i.icon-shopping-cart.green
+						p You have some new orders
+						span.badge.badge-success +10
+				li.more
+					a(href='#') See all notifications
+		li.hidden-xs
+			a.dropdown-toggle(data-toggle='dropdown', href='#')
+				i.icon-envelope.anim-top-down
+				span.badge.badge-success 3
+			ul.dropdown-navbar.dropdown-menu
+				li.nav-header
+					i.icon-comments
+					| 3 Messages
+				li.msg
+					a(href='#')
+						img(src='img/demo/avatar/avatar3.jpg', alt='Sarah"s Avatar')
+						div
+							span.msg-title Sarah
+							span.msg-time
+								i.icon-time
+								span a moment ago
+						p
+							| Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+				li.msg
+					a(href='#')
+						img(src='img/demo/avatar/avatar4.jpg', alt='Emma"s Avatar')
+						div
+							span.msg-title Emma
+							span.msg-time
+								i.icon-time
+								span 2 Days ago
+						p Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ...
+				li.msg
+					a(href='#')
+						img(src='img/demo/avatar/avatar5.jpg', alt='John"s Avatar')
+						div
+							span.msg-title John
+							span.msg-time
+								i.icon-time
+								span 8:24 PM
+						p Duis aute irure dolor in reprehenderit in ...
+				li.more
+					a(href='#') See all messages
+		li.user-profile
+			a.user-menu.dropdown-toggle(data-toggle='dropdown', href='#')
+				img.nav-user-photo(src='img/demo/avatar/avatar1.jpg', alt='Penny"s Photo')
+				span#user_info.hidden-sm
+					| Penny
+				i.icon-caret-down
+			ul#user_menu.dropdown-menu.dropdown-navbar
+				li.nav-header
+					i.icon-time
+					| Logined From 20:45
+				li
+					a(href='#')
+						i.icon-cog
+						| Account Settings
+				li
+					a(href='#')
+						i.icon-user
+						| Edit Profile
+				li
+					a(href='#')
+						i.icon-question
+						| Help
+				li.divider.visible-sm
+				li.visible-sm
+					a(href='#')
+						i.icon-tasks
+						| Tasks
+						span.badge.badge-warning 4
+				li.visible-sm
+					a(href='#')
+						i.icon-bell-alt
+						| Notifications
+						span.badge.badge-important 8
+				li.visible-sm
+					a(href='#')
+						i.icon-envelope
+						| Messages
+						span.badge.badge-success 5
+				li.divider
+				li
+					a(href='#')
+						i.icon-off
+						| Logout
