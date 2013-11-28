@@ -1,0 +1,49 @@
+extends ../layout
+
+block content
+	#main-content
+		.row
+			.col-md-12
+				.box.box-orange
+					.box-title
+						h3
+							i.icon-file
+							| Edit City
+						.box-tool
+							a(data-action="collapse", href="#")
+								i.icon-chevron-up
+							a(data-action="close", href="#")
+								i.icon-remove
+					.box-content(style="min-height:500px;")
+						form(action="/addcity", class="form-horizontal", method="POST", enctype="multipart/form-data", id="addCityForm")
+							.form-group
+								label.col-sm-3.col-lg-2.control-label Country
+								.col-sm-9.col-lg-10.controls
+									select#country.form-control.chosen.chzn-done(data-placeholder='Choose a country', tabindex='1', style='', name ="country")
+										option(value='vn') Viet Nam
+							.form-group
+								label.col-sm-3.col-lg-2.control-label City Code
+								.col-sm-9.col-lg-10.controls
+									if(resultJson != null)
+										input.form-control#city(type='text', readonly="readonly", value= resultJson.result.city, name ="city", tabindex='2')
+										input.form-control#cityid(style='display:none;', type='text', value= resultJson.result._id, name ="cityid")
+										input.form-control#countrytmp(style='display:none;', type='text', value= resultJson.result.country)
+									else
+										input.form-control#city(type='text', value='', name ="city", tabindex='1')
+										input.form-control#cityid(style='display:none;', type='text', value='', name ="cityid")
+										input.form-control#countrytmp(style='display:none;', type='text', value='')
+							.form-group
+								label.col-sm-3.col-lg-2.control-label City Name
+								.col-sm-9.col-lg-10.controls
+									if(resultJson != null)
+										input.form-control#cityname(type='text', value= resultJson.result.cityName, name ="cityname", tabindex='3')
+									else
+										input.form-control#cityname(type='text', value='', name ="cityname", tabindex='4')
+							.form-group
+								label.col-sm-3.col-lg-2.control-label
+								.col-sm-9.col-lg-10.controls
+									button.btn.btn-primary(type='submit',id = "btnSave", tabindex='5') Submit
+									button.btn(type='button', ,id = "btnCancel", tabindex='6') Cancel
+block scripts
+	script(src='/vendor/jquery.form.js')
+	script(src='/javascripts/city.js')

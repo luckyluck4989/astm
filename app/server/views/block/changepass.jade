@@ -1,0 +1,43 @@
+extends ../layout
+
+block content
+	#main-content
+		#breadcrumbs
+			ul(class="breadcrumb")
+				li
+					i(class="icon-home")
+					a(href="/admin") Home
+					span(class="divider")
+						i(class="icon-angle-right")
+				li(class="active")Location
+		.row
+			.col-md-12
+				.box.box-orange
+					.box-title
+						h3
+							i.icon-file
+							| Edit Profile
+						.box-tool
+							a(data-action="collapse", href="#")
+								i.icon-chevron-up
+							a(data-action="close", href="#")
+								i.icon-remove
+					.box-content
+						form(action="/chgpass", class="form-horizontal", method="POST", enctype="multipart/form-data", id="chgpassForm")
+							.form-group
+								label.col-sm-3.col-lg-2.control-label New Password
+								.col-sm-9.col-lg-10.controls
+									input.form-control#newpass(type='password', value='', name ="newpass", tabindex='1')
+							.form-group
+								label.col-sm-3.col-lg-2.control-label Confirm New Password
+								.col-sm-9.col-lg-10.controls
+									input.form-control#confirmpass(type='password', value='', name ="confirmpass", tabindex='2')
+							.form-group
+								label.col-sm-3.col-lg-2.control-label
+								.col-sm-9.col-lg-10.controls
+									button.btn.btn-primary(type='submit',id = "btnSave", tabindex='8') Submit
+block scripts
+	//script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+	script(src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places")
+	script(src='/vendor/jquery.form.js')
+	script(src='/javascripts/changepass.js')

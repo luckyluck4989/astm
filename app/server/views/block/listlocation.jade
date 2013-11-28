@@ -2,14 +2,6 @@ extends ../layout
 
 block content
 	#main-content
-		#breadcrumbs
-			ul(class="breadcrumb")
-				li
-					i(class="icon-home")
-					a(href="/admin") Home
-					span(class="divider")
-						i(class="icon-angle-right")
-				li(class="active")List Location
 		.row
 			.col-md-12
 				.box.box-black
@@ -25,21 +17,12 @@ block content
 					.box-content
 						.btn-toolbar.pull-right
 							.btn-group
-								a.btn.btn-circle.show-tooltip(title='', href='#', data-original-title='Add new record')
+								a.btn.btn-circle.show-tooltip(title='', href='/location', data-original-title='Add new record')
 									i.icon-plus
 								a.btn.btn-circle.show-tooltip(title='', href='#', data-original-title='Edit selected')
 									i.icon-edit
-								a.btn.btn-circle.show-tooltip(title='', href='#', data-original-title='Delete selected')
-									i.icon-trash
 							.btn-group
-								a.btn.btn-circle.show-tooltip(title='', href='#', data-original-title='Print')
-									i.icon-print
-								a.btn.btn-circle.show-tooltip(title='', href='#', data-original-title='Export to PDF')
-									i.icon-file-text-alt
-								a.btn.btn-circle.show-tooltip(title='', href='#', data-original-title='Export to Exel')
-									i.icon-table
-							.btn-group
-								a.btn.btn-circle.show-tooltip(title='', href='#', data-original-title='Refresh')
+								a.btn.btn-circle.show-tooltip(title='', href='/listlocation', data-original-title='Refresh')
 									i.icon-repeat
 						br
 						br
@@ -64,7 +47,7 @@ block content
 													td
 														input(type='checkbox')
 													td
-														a(href='#')= resultJson.result[i].namelocation
+														a(href='#', class='locaid')= resultJson.result[i].namelocation
 													td= resultJson.result[i].country
 													td= resultJson.result[i].city
 													if resultJson.result[i].isrecommend=='true'
@@ -74,19 +57,19 @@ block content
 														td 
 													td
 														span.label.label-success= resultJson.result[i].like
-													td(style='display:none;')= resultJson.result[i]._id
+													td#rowID(style='display:none;')= resultJson.result[i]._id
 													td.visible-md.visible-lg
 														.btn-group
-															a.btn.btn-sm.show-tooltip(title='', href='#', data-original-title='Edit')
+															a.btn.btn-sm.show-tooltip(title='', href='#', class='locaid', data-original-title='Edit')
 																i.icon-edit
-															a.btn.btn-sm.btn-danger.show-tooltip(title='', href='#', data-original-title='Delete')
+															a.btn.btn-sm.btn-danger.show-tooltip(title='', class='dellocaid', href='#', data-original-title='Delete')
 																i.icon-trash
 											else
 												tr.table-flag-blue
 													td
 														input(type='checkbox')
 													td
-														a(href='#')= resultJson.result[i].namelocation
+														a(href='#', class='locaid')= resultJson.result[i].namelocation
 													td= resultJson.result[i].country
 													td= resultJson.result[i].city
 													if resultJson.result[i].isrecommend=='true'
@@ -96,12 +79,12 @@ block content
 														td 
 													td
 														span.label.label-success= resultJson.result[i].like
-													td(style='display:none;')= resultJson.result[i]._id
+													td#rowID(style='display:none;')= resultJson.result[i]._id
 													td.visible-md.visible-lg
 														.btn-group
-															a.btn.btn-sm.show-tooltip(title='', href='#', data-original-title='Edit')
+															a.btn.btn-sm.show-tooltip(title='', href='#' , class='locaid', data-original-title='Edit')
 																i.icon-edit
-															a.btn.btn-sm.btn-danger.show-tooltip(title='', href='#', data-original-title='Delete')
+															a.btn.btn-sm.btn-danger.show-tooltip(title='', href='#', class='dellocaid', data-original-title='Delete')
 																i.icon-trash
 						.text-center
 							ul.pagination#pagingid

@@ -38,6 +38,7 @@ module.exports = {
 		systemstatus:db.collection('systemstatus'),
 		paramsetting:db.collection('paramsetting'),
 		userhistory:db.collection('userhistory'),
+		logcollect:db.collection('logcollect'),
 		crypto:crypto,
 		ObjectID:ObjectID,
 		moment:moment 

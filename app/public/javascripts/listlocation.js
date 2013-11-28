@@ -39,6 +39,54 @@ $(document).ready(function() {
 		});
 		return false;
 	});
+
+	//-------------------------------
+	// Event click on each item name location
+	//-------------------------------
+	$(".locaid").click(function(){
+		var locationid = $(this).closest('tr').find("#rowID").html();
+
+		// Call ajax to get location
+		var input = {"locationid" : locationid};
+		$.ajax({
+			url: '/admlocation',
+			type: 'POST',
+			data: input,
+			success: function(data){
+				if(data){
+					window.location.href = '/location';
+				}
+			},
+			error: function(jqXHR){
+				console.log(jqXHR.responseText+' :: '+jqXHR.statusText);
+			}
+		});
+		return false;
+	});
+
+	//-------------------------------
+	// Event click delete on each item name location
+	//-------------------------------
+	$(".dellocaid").click(function(){
+		var locationid = $(this).closest('tr').find("#rowID").html();
+
+		// Call ajax to get location
+		var input = {"locationid" : locationid};
+		$.ajax({
+			url: '/dellocation',
+			type: 'POST',
+			data: input,
+			success: function(data){
+				if(data){
+					window.location.href = '/listlocation';
+				}
+			},
+			error: function(jqXHR){
+				console.log(jqXHR.responseText+' :: '+jqXHR.statusText);
+			}
+		});
+		return false;
+	});
 });
 
 //-------------------------------
@@ -54,14 +102,14 @@ function drawData(dataJson){
 		else
 			tmpRow = '	<tr class="table-flag-blue">';
 		tmpRow += '			<td><input type="checkbox"></td>'
-		tmpRow += '			<td><a href="#">' + dataJson[i].namelocation + '</a></td>'
+		tmpRow += '			<td><a href="#" class="locaid">' + dataJson[i].namelocation + '</a></td>'
 		tmpRow += '			<td>' + dataJson[i].country + '</td><td>' + dataJson[i].city + '</td>'
 		if(dataJson[i].isrecommend == 'true')
 			tmpRow += '		<td><span class="label label-success">Recommend</span></td>'
 		else
 			tmpRow += '		<td></td>'
 		tmpRow += '			<td><span class="label label-success">' + dataJson[i].like + '</span></td>'
-		tmpRow += '			<td style="display:none;">' + dataJson[i]._id + '</td>';
+		tmpRow += '			<td id="rowID" style="display:none;">' + dataJson[i]._id + '</td>';
 		tmpRow += '			<td class="visible-md visible-lg">'
 		tmpRow += '				<div class="btn-group">'
 		tmpRow += '					<a title="" href="#" data-original-title="Edit" class="btn btn-sm show-tooltip">'

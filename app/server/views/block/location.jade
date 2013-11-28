@@ -9,7 +9,7 @@ block content
 					a(href="/admin") Home
 					span(class="divider")
 						i(class="icon-angle-right")
-				li(class="active")User Profile
+				li(class="active")Location
 		.row
 			.col-md-12
 				.box.box-orange
@@ -27,12 +27,13 @@ block content
 							.form-group
 								label.col-sm-3.col-lg-2.control-label Location Name
 								.col-sm-9.col-lg-10.controls
-									input.form-control(type='text', value='Jack', name ="namelocation", tabindex='1')
-									input.form-control(style='display:none;', type='text', value='Jack', name ="typeSubmit", id ="typeSubmit")
+									input.form-control#namelocation(type='text', value='Jack', name ="namelocation", tabindex='1')
+									input.form-control#typeSubmit(style='display:none;', type='text', value='Jack', name ="typeSubmit")
+									input.form-control#locationid(style='display:none;', type='text', value=locationid, name ="locationid")
 							.form-group
 								label.col-sm-3.col-lg-2.control-label Country
 								.col-sm-9.col-lg-10.controls
-									select#selRPO.form-control.chosen.chzn-done(data-placeholder='Choose a country', tabindex='2', style='', name ="country")
+									select#country.form-control.chosen.chzn-done(data-placeholder='Choose a country', tabindex='2', style='', name ="country")
 										option(value='vn') Viet Nam
 										option(value='jp', selected='') Japan
 										option(value='us') USA
@@ -40,7 +41,7 @@ block content
 							.form-group
 								label.col-sm-3.col-lg-2.control-label City
 								.col-sm-9.col-lg-10.controls
-									select#selRPO.form-control.chosen.chzn-done(data-placeholder='Choose a country', tabindex='3', style='', name = "city")
+									select#city.form-control.chosen.chzn-done(data-placeholder='Choose a country', tabindex='3', style='', name = "city")
 										option(value='vn-hcm') Ho Chi Minh
 										option(value='vn-hn', selected='') Ha Noi
 										option(value='vn-dn') Da Nang
@@ -48,7 +49,7 @@ block content
 							.form-group
 								label.col-sm-3.col-lg-2.control-label Desciprtion
 								.col-sm-9.col-lg-10.controls
-									textarea.form-control(rows='6', name = "description", tabindex='4')
+									textarea.form-control#description(rows='6', name = "description", tabindex='4')
 										| Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ultrices, justo vel imperdiet gravida, urna ligula hendrerit nibh, ac cursus nibh sapien in purus. Mauris tincidunt tincidunt turpis in porta. Integer fermentum tincidunt auctor.
 							.form-group
 								label.col-sm-3.col-lg-2.control-label
@@ -64,7 +65,7 @@ block content
 							.form-group
 								label.col-sm-3.col-lg-2.control-label Adress Location
 								.col-sm-9.col-lg-10.controls
-									input.form-control(id="searchTextField", type='text', size="50", tabindex='6')
+									input.form-control(id="searchTextField", type='text', size="50", tabindex='6', name='address')
 							.form-group
 								label.col-sm-3.col-lg-2.control-label Maps
 								.col-sm-9.col-lg-10.controls
@@ -72,12 +73,12 @@ block content
 							.form-group
 								label.col-sm-3.col-lg-2.control-label Is On Recommend
 								.col-sm-9.col-lg-10.controls
-									input(type="checkbox",name="isrecommend",value="true", tabindex='7')
+									input#isrecommend(type="checkbox",name="isrecommend",value="true", tabindex='7')
 							.form-group
 								label.col-sm-3.col-lg-2.control-label
 								.col-sm-9.col-lg-10.controls
 									button.btn.btn-primary(type='submit',id = "btnSave", tabindex='8') Submit
-									button.btn(type='button', tabindex='9') Cancel
+									button.btn(type='button', id = "btnCancel", tabindex='9') Cancel
 block scripts
 	//script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
 	script(src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places")

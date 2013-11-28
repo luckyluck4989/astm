@@ -1,0 +1,70 @@
+extends ../layout
+
+block content
+	#main-content
+		.row
+			.col-md-12
+				.box.box-black
+					.box-title
+						h3
+							i.icon-file
+							| List City
+						.box-tool
+							a(data-action="collapse", href="#")
+								i.icon-chevron-up
+							a(data-action="close", href="#")
+								i.icon-remove
+					.box-content(style="min-height:500px;")
+						.btn-toolbar.pull-right
+							.btn-group
+								a.btn.btn-circle.show-tooltip(title='', href='/city', data-original-title='Add new city')
+									i.icon-plus
+							.btn-group
+								a.btn.btn-circle.show-tooltip(title='', href='/listcity', data-original-title='Refresh')
+									i.icon-repeat
+						br
+						br
+						.table-responsive
+							table.table.table-advance#locationtbl
+								thead
+									tr
+										th(style='width:18px')
+											input(type='checkbox',style="display:none;")
+										th City Code
+										th Country Code
+										th City Name
+										th.visible-md.visible-lg(style='width:130px') Action
+								tbody
+									if(resultJson.result.length>0)
+										-	for(var i=0;i<resultJson.result.length;i++)
+											if(i%2 != 0)
+												tr
+													td
+														input(type='checkbox',style="display:none;")
+													td
+														a#cityid(href='#', class='cityid')= resultJson.result[i].city
+													td= resultJson.result[i].cityName
+													td= resultJson.result[i].country
+													td.visible-md.visible-lg
+														.btn-group
+															a.btn.btn-sm.show-tooltip(title='', href='#', class='cityid', data-original-title='Edit')
+																i.icon-edit
+															a.btn.btn-sm.btn-danger.show-tooltip(title='', href='#', class='delcity', data-original-title='Delete')
+																i.icon-trash
+											else
+												tr.table-flag-blue
+													td
+														input(type='checkbox',style="display:none;")
+													td
+														a#cityid(href='#', class='cityid')= resultJson.result[i].city
+													td= resultJson.result[i].cityName
+													td= resultJson.result[i].country
+													td.visible-md.visible-lg
+														.btn-group
+															a.btn.btn-sm.show-tooltip(title='', href='#', class='cityid', data-original-title='Edit')
+																i.icon-edit
+															a.btn.btn-sm.btn-danger.show-tooltip(title='', href='#', class='delcity', data-original-title='Delete')
+																i.icon-trash
+block scripts
+	script(src='/vendor/jquery.form.js')
+	script(src='/javascripts/listcity.js')

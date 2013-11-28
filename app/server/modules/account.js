@@ -86,21 +86,10 @@ exports.addUser = function(userid,password,email,callback){
 }
 
 // Update comment and like
-exports.updateUserInfo = function(userid,
-								  iname,
-								  ipass,
-								  iemail,
-								  icountry,
-								  ifood,
-								  ilocation,
-								  inotes, callback){
-	accountDB.update( { 'userid' : userid }, { $set : { name : iname,
-													  password : ipass,
-													  email: iemail,
-													  country: icountry,
-													  favour_food: ifood,
-													  favour_location: ilocation,
-													  notes: inotes} }, function(err,result){
+exports.updatePassWord = function(userid,
+								  ipass, callback){
+	var pword = crypto.createHash('md5').update(ipass).digest("hex");
+	accountDB.update( { 'userid' : userid }, { $set : { password : pword} }, function(err,result){
 		if(err)
 			callback(err,'Can not update user');
 		else

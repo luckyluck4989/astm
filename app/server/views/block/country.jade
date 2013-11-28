@@ -1,0 +1,42 @@
+extends ../layout
+
+block content
+	#main-content
+		.row
+			.col-md-12
+				.box.box-orange
+					.box-title
+						h3
+							i.icon-file
+							| Edit Country
+						.box-tool
+							a(data-action="collapse", href="#")
+								i.icon-chevron-up
+							a(data-action="close", href="#")
+								i.icon-remove
+					.box-content(style="min-height:500px;")
+						form(action="/addcountry", class="form-horizontal", method="POST", enctype="multipart/form-data", id="addCountryForm")
+							.form-group
+								label.col-sm-3.col-lg-2.control-label Country Code
+								.col-sm-9.col-lg-10.controls
+									if(resultJson != null)
+										input.form-control#country(type='text', readonly="readonly", value= resultJson.result.country, name ="country", tabindex='1')
+										input.form-control#countryid(style='display:none;', type='text', value= resultJson.result._id, name ="countryid")
+									else
+										input.form-control#country(type='text', value='', name ="country", tabindex='1')
+										input.form-control#countryid(style='display:none;', type='text', value='', name ="countryid")
+							.form-group
+								label.col-sm-3.col-lg-2.control-label Country Name
+								.col-sm-9.col-lg-10.controls
+									if(resultJson != null)
+										input.form-control#countryname(type='text', value= resultJson.result.countryName, name ="countryname", tabindex='2')
+									else
+										input.form-control#countryname(type='text', value='', name ="countryname", tabindex='2')
+							.form-group
+								label.col-sm-3.col-lg-2.control-label
+								.col-sm-9.col-lg-10.controls
+									button.btn.btn-primary(type='submit',id = "btnSave", tabindex='8') Submit
+									button.btn(type='button', ,id = "btnCancel", tabindex='9') Cancel
+block scripts
+	script(src='/vendor/jquery.form.js')
+	script(src='/javascripts/country.js')

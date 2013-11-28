@@ -1,0 +1,67 @@
+extends ../layout
+
+block content
+	#main-content
+		.row
+			.col-md-12
+				.box.box-black
+					.box-title
+						h3
+							i.icon-file
+							| List Country
+						.box-tool
+							a(data-action="collapse", href="#")
+								i.icon-chevron-up
+							a(data-action="close", href="#")
+								i.icon-remove
+					.box-content(style="min-height:500px;")
+						.btn-toolbar.pull-right
+							.btn-group
+								a.btn.btn-circle.show-tooltip(title='', href='/country', data-original-title='Add new country')
+									i.icon-plus
+							.btn-group
+								a.btn.btn-circle.show-tooltip(title='', href='/listcountry', data-original-title='Refresh')
+									i.icon-repeat
+						br
+						br
+						.table-responsive
+							table.table.table-advance#locationtbl
+								thead
+									tr
+										th(style='width:18px')
+											input(type='checkbox',style="display:none;")
+										th Country Code
+										th Country Name
+										th.visible-md.visible-lg(style='width:130px') Action
+								tbody
+									if(resultJson.result.length>0)
+										-	for(var i=0;i<resultJson.result.length;i++)
+											if(i%2 != 0)
+												tr
+													td
+														input(type='checkbox',style="display:none;")
+													td
+														a#countryid(href='#', class='countryid')= resultJson.result[i].country
+													td= resultJson.result[i].countryName
+													td.visible-md.visible-lg
+														.btn-group
+															a.btn.btn-sm.show-tooltip(title='', href='#', class='countryid', data-original-title='Edit')
+																i.icon-edit
+															a.btn.btn-sm.btn-danger.show-tooltip(title='', href='#', class='delcountry', data-original-title='Delete')
+																i.icon-trash
+											else
+												tr.table-flag-blue
+													td
+														input(type='checkbox',style="display:none;")
+													td
+														a#countryid(href='#', class='countryid')= resultJson.result[i].country
+													td= resultJson.result[i].countryName
+													td.visible-md.visible-lg
+														.btn-group
+															a.btn.btn-sm.show-tooltip(title='', href='#', class='countryid', data-original-title='Edit')
+																i.icon-edit
+															a.btn.btn-sm.btn-danger.show-tooltip(title='', href='#', class='delcountry', data-original-title='Delete')
+																i.icon-trash
+block scripts
+	script(src='/vendor/jquery.form.js')
+	script(src='/javascripts/listcountry.js')

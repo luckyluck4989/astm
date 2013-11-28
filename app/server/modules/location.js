@@ -49,74 +49,95 @@ exports.addImage = function(input, image, callback){
 // Param callback: funtion callback
 //--------------------------------
 exports.addLocation = function(input, callback){
-	//-----------------------------------------
-	// Define item insert to database
-	//-----------------------------------------
-	var itemEntry = {	namelocation: 'Jack1',
-						country: 'vn',
-						city: 'hochiminh-quan2',
-						isrecommend: '',
-						description: '',
-						imagelist: [],
-						checkin: [],
-						imagethumb: '',
-						coordinate: [],
-						like: 0,
-						comment: 0,
-						fbid: ''
-					};
-	itemEntry.namelocation = input.namelocation;
-	itemEntry.country = input.country;
-	itemEntry.city = input.city;
-	itemEntry.description = input.description;
-	itemEntry.imagelist = input.imagelist.split(",");
-	itemEntry.imagethumb = itemEntry.imagelist[0];
-	var cordi = input.coordinate.split(",");
-	itemEntry.coordinate = [Number(cordi[0]),Number(cordi[1])];
-	itemEntry.isrecommend = input.isrecommend;
-	if (itemEntry._id) {
-		itemEntry._id = new ObjectID(itemEntry._id);
-	}
+	if(input.locationid == ''){
+		//-----------------------------------------
+		// Define item insert to database
+		//-----------------------------------------
+		var itemEntry = {	namelocation: 'Jack1',
+							country: 'vn',
+							city: 'hochiminh-quan2',
+							isrecommend: '',
+							description: '',
+							imagelist: [],
+							checkin: [],
+							imagethumb: '',
+							coordinate: [],
+							like: 0,
+							comment: 0,
+							address : '',
+							fbid: ''
+						};
+		itemEntry.namelocation = input.namelocation;
+		itemEntry.country = input.country;
+		itemEntry.city = input.city;
+		itemEntry.description = input.description;
+		itemEntry.imagelist = input.imagelist.split(",");
+		itemEntry.imagethumb = itemEntry.imagelist[0];
+		var cordi = input.coordinate.split(",");
+		itemEntry.coordinate = [Number(cordi[0]),Number(cordi[1])];
+		itemEntry.isrecommend = input.isrecommend;
+		itemEntry.address = input.address;
+		if (itemEntry._id) {
+			itemEntry._id = new ObjectID(itemEntry._id);
+		}
 
-	//-----------------------------------------
-	// Post to facebook
-	//-----------------------------------------
-	var form = new FormData(); //Create multipart form
-	form.append('file', fs.createReadStream('./app/public/upload/'+ itemEntry.imagethumb)); //Put file
-	form.append('message', itemEntry.description); //Put message
-	 
-	//POST request options, notice 'path' has access_token parameter
-	var options = {
-		method: 'post',
-		host: 'graph.facebook.com',
-		path: '/534081833342710/photos?access_token=' + ACCESS_TOKEN,
-		headers: form.getHeaders(),
-	}
+		//-----------------------------------------
+		// Post to facebook
+		//-----------------------------------------
+		var form = new FormData(); //Create multipart form
+		form.append('file', fs.createReadStream('./app/public/upload/'+ itemEntry.imagethumb)); //Put file
+		form.append('message', itemEntry.description); //Put message
+		 
+		//POST request options, notice 'path' has access_token parameter
+		var options = {
+			method: 'post',
+			host: 'graph.facebook.com',
+			path: '/534081833342710/photos?access_token=' + ACCESS_TOKEN,
+			headers: form.getHeaders(),
+		}
 
-	//Do POST request, callback for response
-	var request = https.request(options, function (response){
-		//console.log('STATUS: ' + response.statusCode);
-		//console.log('HEADERS: ' + JSON.stringify(response.headers));
-		response.setEncoding('utf8');
+		//Do POST request, callback for response
+		var request = https.request(options, function (response){
+			//console.log('STATUS: ' + response.statusCode);
+			//console.log('HEADERS: ' + JSON.stringify(response.headers));
+			response.setEncoding('utf8');
 
-		response.on('data', function(chunk) {
-			itemEntry.fbid = (JSON.parse(chunk)).id;
-			console.log(itemEntry.fbid);
+			response.on('data', function(chunk) {
+				itemEntry.fbid = (JSON.parse(chunk)).id;
+				console.log(itemEntry.fbid);
+			});
+
+			response.on('end', function() {
+				locationDB.save(itemEntry, {safe: true}, callback);
+			});
+
 		});
+		 
+		//Binds form to request
+		form.pipe(request);
 
-		response.on('end', function() {
-			locationDB.save(itemEntry, {safe: true}, callback);
+		//If anything goes wrong (request-wise not FB)
+		request.on('error', function (error) {
+			callback(error,null);
 		});
-
-	});
-	 
-	//Binds form to request
-	form.pipe(request);
-
-	//If anything goes wrong (request-wise not FB)
-	request.on('error', function (error) {
-		callback(error,null);
-	});
+	} else {
+		var cordi = input.coordinate.split(",");
+		locationDB.update( { _id : new ObjectID(input.locationid) }, 
+							{ $set : { namelocation : input.namelocation,
+									   country 		: input.country,
+									   city			: input.city,
+									   address		: input.address,
+									   description	: input.description,
+									   imagelist	: input.imagelist.split(","),
+									   coordinate	: [Number(cordi[0]),Number(cordi[1])],
+									   isrecommend	: input.isrecommend
+							} }, function(err,result){
+			if(err)
+				callback(err,'Can not update user');
+			else
+				callback(null,result);
+		});
+	}
 }
 
 //--------------------------------
@@ -326,6 +347,20 @@ exports.getListLocation = function(page,offset,callback){
 	locationDB.find({}).sort([['_id','desc']]).skip(iSkip).limit(iOffset).toArray(function(err,result){
 		if(err)
 			callback(err,'Can not get list location');
+		else
+			callback(null,result);
+	});
+}
+
+//--------------------------------
+// Delete  location
+// Param locationid: id of location
+// Param callback: funtion callback
+//--------------------------------
+exports.deleteLocation = function(locationid, callback){
+	locationDB.remove( { _id : new ObjectID(locationid) }, function(err,result){
+		if(err)
+			callback(err,'Can not delete user');
 		else
 			callback(null,result);
 	});

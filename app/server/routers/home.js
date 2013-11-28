@@ -3,6 +3,8 @@ var locationModel = require('../modules/location')
 var imageModel = require('../modules/image')
 var userHistoryModel = require('../modules/userhistory')
 var geogModel = require('../modules/geog')
+var logModel = require('../modules/logcollect')
+var crypto = require('crypto')
 
 //--------------------------------
 // Define Variable
@@ -49,60 +51,86 @@ module.exports = function(app, nodeuuid){
 		res.render('block/admin', { title: 'Admin Page' });
 	});
 
-	app.get('/home',function(req,res){
-		res.render('block/location', { title: 'Admin Page', path: req.path });
-	});
-
 	app.get('/admin',function(req,res){
 		res.render('block/admin', { title: 'Admin Page' });
 	});
 
+	//------------------------------------------------------------------
+	// Get list location page = 1
+	// Return: render location page
+	//------------------------------------------------------------------
 	app.get('/listlocation',function(req,res){
-		var page = 1;
-		var offset = 10;
-		locationModel.getListLocation(page, offset, function (err, retJson) {
-			if (err) {
-				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else {
-				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-				res.render('block/listlocation', { title: 'List Location', path : req.path, resultJson : jsonResult });
-			}
-		});
+		if(req.session.user != null){
+			var page = 1;
+			var offset = 10;
+			locationModel.getListLocation(page, offset, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.render('block/listlocation', { title: 'List Location', path : req.path, resultJson : jsonResult });
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
 	});
 
+	//------------------------------------------------------------------
+	// Get list location by page
+	// Return: list location
+	//------------------------------------------------------------------
 	app.post('/listlocation',function(req,res){
-		var input = req.body;
-		var page = input.page;
-		var offset = 10;
-		locationModel.getListLocation(page, offset, function (err, retJson) {
-			if (err) {
-				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else {
-				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-				res.json(jsonResult, 200);
-			}
-		});
+		if(req.session.user != null){
+			var input = req.body;
+			var page = input.page;
+			var offset = 10;
+			locationModel.getListLocation(page, offset, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult, 200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
 	});
 
+	//------------------------------------------------------------------
+	// Render view login
+	// Return: render view login
+	//------------------------------------------------------------------
 	app.get('/loginad',function(req,res){
-		res.render('block/loginad', { title: 'List Location', path: req.path, correct : 1 });
+		if(req.session.user != null){
+			res.redirect('/listlocation');
+		} else {
+			// path : use for show view is login or home page
+			res.render('block/loginad', { title: 'List Location', path: req.path });
+		}
 	});
 
-	app.post('/signup',function(req,res){
+	//------------------------------------------------------------------
+	// Signin admin
+	// Return: json user and set req session
+	//------------------------------------------------------------------
+	app.post('/signin',function(req,res){
 		var input = req.body;
-		var userid = input.txtUserName;
-		var password = input.txtPassword;
-		console.log(userid);
+		//var userid = input.txtUserName;
+		var userid = 'admin';
+		var password = crypto.createHash('md5').update(input.txtPassword).digest("hex");
 		accountModel.checkLogin(userid, password, function (err, objects) {
 			if (err) {
-				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
+				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null);
 				res.json(jsonResult, 400);
 				return;
 			} else if(objects != null && objects.userid != undefined ){
+				req.session.user = objects;
 				var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, objects);
 				res.json(jsonResult, 200);
 			} else {
@@ -110,6 +138,490 @@ module.exports = function(app, nodeuuid){
 				res.json(jsonResult, 200);
 			}
 		});
+	});
+
+	//------------------------------------------------------------------
+	// Set location to session
+	// Return: list location
+	//------------------------------------------------------------------
+	app.post('/admlocation',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			req.session.locationid = input.locationid;
+			res.json(req.session.user, 200);
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//------------------------------------------------------------------
+	// Get location in admin
+	// Return: list location
+	//------------------------------------------------------------------
+	app.get('/location',function(req,res){
+		if(req.session.user != null){
+			if(req.session.locationid != null){
+				res.render('block/location', { title: 'Admin Page', path: req.path, locationid : req.session.locationid });
+			} else {
+				res.render('block/location', { title: 'Admin Page', path: req.path, locationid : null });
+			}
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//------------------------------------------------------------------
+	// Set location to session
+	// Return: list location
+	//------------------------------------------------------------------
+	app.post('/getadmlocation',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var locationid = input.locationid;
+			locationModel.getLocation(locationid, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					req.session.locationid = null;
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+					res.json(jsonResult, 200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Get list country and city
+	// Return: JSON list country
+	//--------------------------------
+	app.post('/getlistcc',function(req,res){
+		if(req.session.user != null){
+			geogModel.getListCountry(function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					geogModel.getListCity(function (err, retJsonCity) {
+						if (err) {
+							var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							var jsonResult = createJsonResult('GetListCountry', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+							jsonResult.resultcity = retJsonCity;
+							res.json(jsonResult,200);
+						}
+					});
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Report User By Month
+	// Return: Draw view user by month
+	//--------------------------------
+	app.get('/rptuserbymonth',function(req,res){
+		if(req.session.user != null){
+			res.render('block/rptuserbymonth', { title: 'Admin Page', path: req.path});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Report User By Month
+	// Return: Draw view user by month
+	//--------------------------------
+	app.post('/rptuserbymonthsearch',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var from = input.from;
+			var to = input.to;
+			//var from = 201301;
+			//var to = 201312;
+			logModel.reportUserLoginByMonth(from, to, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Report User Month', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Report User Month', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult, 200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Report User By Month
+	// Return: Draw view user by month
+	//--------------------------------
+	app.get('/rptuserbyyear',function(req,res){
+		if(req.session.user != null){
+			res.render('block/rptuserbyyear', { title: 'Admin Page', path: req.path});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Report User By Year
+	// Return: Draw view user by month
+	//--------------------------------
+	app.post('/rptuserbyyearsearch',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var from = input.from;
+			var to = input.to;
+			//var from = 201301;
+			//var to = 201312;
+			logModel.reportUserLoginByYear(from, to, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Report User Year', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Report User Year', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult, 200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Report User By City
+	// Return: Draw view user by month
+	//--------------------------------
+	app.get('/rptuserbycity',function(req,res){
+		if(req.session.user != null){
+			res.render('block/rptuserbycity', { title: 'Admin Page', path: req.path});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Report User By City
+	// Return: Draw view user by month
+	//--------------------------------
+	app.post('/rptuserbycitysearch',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var from = input.from;
+			var to = input.to;
+			//var from = 201301;
+			//var to = 201312;
+			logModel.reportUserLoginByCity(from, to, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Report User Year', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Report User Year', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult,200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Report User By City
+	// Return: Draw view user by month
+	//--------------------------------
+	app.get('/changepass',function(req,res){
+		if(req.session.user != null){
+			res.render('block/changepass', { title: 'Admin Page', path: req.path});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Report User By City
+	// Return: Draw view user by month
+	//--------------------------------
+	app.get('/signout',function(req,res){
+		req.session.user = null;
+		res.redirect('/loginad');
+	});
+
+	//--------------------------------
+	// Change pass
+	// Return: Draw view user by month
+	//--------------------------------
+	app.post('/chgpass',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var pass = input.newpass;
+			accountModel.updatePassWord(req.session.user.userid, pass, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Change Pass', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Change Pass', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult,200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Get list country
+	// Return: Draw view user by month
+	//--------------------------------
+	app.get('/listcountry',function(req,res){
+		if(req.session.user != null){
+			geogModel.getListCountry(function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.render('block/listcountry', { title: 'List Country', path : req.path, resultJson : jsonResult });
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//------------------------------------------------------------------
+	// Set country
+	// Return: country
+	//------------------------------------------------------------------
+	app.post('/setcountry',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			req.session.country = input.countryid;
+			res.json(req.session.country, 200);
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//------------------------------------------------------------------
+	// Get country in admin
+	// Return: country
+	//------------------------------------------------------------------
+	app.get('/country',function(req,res){
+		if(req.session.user != null){
+			if(req.session.country != null){
+				geogModel.getCountry(req.session.country, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+						req.session.country = null;
+						res.render('block/country', { title: 'Admin Page', path: req.path, resultJson : jsonResult });
+					}
+				});
+			} else {
+				res.render('block/country', { title: 'Admin Page', path: req.path, resultJson : null });
+			}
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Update Country
+	// Return: Update country
+	//--------------------------------
+	app.post('/addcountry',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var country = input.country;
+			var countryid = input.countryid;
+			var countryname = input.countryname;
+			geogModel.updateCountry(country, countryid, countryname, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Update Country', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Update Country', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult,200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Delete Country
+	// Return: Delete country
+	//--------------------------------
+	app.post('/delcountry',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var country = input.countryid;
+			geogModel.deleteCountry(country, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Delete Country', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Delete Country', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult,200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Get list city
+	// Return: Draw view user by month
+	//--------------------------------
+	app.get('/listcity',function(req,res){
+		if(req.session.user != null){
+			geogModel.getListCity(function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.render('block/listcity', { title: 'List City', path : req.path, resultJson : jsonResult });
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//------------------------------------------------------------------
+	// Set city
+	// Return: city
+	//------------------------------------------------------------------
+	app.post('/setcity',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			req.session.city = input.cityid;
+			res.json(req.session.city, 200);
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//------------------------------------------------------------------
+	// Get city in admin
+	// Return: city
+	//------------------------------------------------------------------
+	app.get('/city',function(req,res){
+		if(req.session.user != null){
+			if(req.session.city != null){
+				geogModel.getCity(req.session.city, function (err, retJson) {
+					if (err) {
+						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+						res.json(jsonResult, 400);
+						return;
+					} else {
+						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+						req.session.city = null;
+						res.render('block/city', { title: 'Admin Page', path: req.path, resultJson : jsonResult });
+					}
+				});
+			} else {
+				res.render('block/city', { title: 'Admin Page', path: req.path, resultJson : null });
+			}
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Update City
+	// Return: Update city
+	//--------------------------------
+	app.post('/addcity',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var city = input.city;
+			var cityid = input.cityid;
+			var cityname = input.cityname;
+			var country = input.country;
+			geogModel.updateCity(city, cityid, cityname, country, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Update City', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Update City', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult,200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Delete City
+	// Return: Delete city
+	//--------------------------------
+	app.post('/delcity',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var city = input.cityid;
+			geogModel.deleteCity(city, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Delete City', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Delete City', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult,200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Delete Location
+	// Return: Delete Location
+	//--------------------------------
+	app.post('/dellocation',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var locationid = input.locationid;
+			locationModel.deleteLocation(locationid, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Delete Location', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Delete Location', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult,200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
 	});
 
 	//------------------------------------------------------------------
@@ -189,14 +701,22 @@ module.exports = function(app, nodeuuid){
 				return;
 			} else if(objects != null && objects.userid != undefined ){
 				var token = nodeuuid.v4();
-				accountModel.insertToken(userid,token, function (err, objects) {
+				accountModel.insertToken(userid,token, function (err, objectsToken) {
 					if (err) {
 						var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null);
 						res.json(jsonResult, 400);
 						return;
 					} else {
-						var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, objects);
-						res.json(jsonResult, 200);
+						logModel.insertLog(userid, function (err, objectsLog) {
+							if(err){
+								var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null);
+								res.json(jsonResult, 400);
+								return;
+							} else {
+								var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, objectsToken);
+								res.json(jsonResult, 200);
+							}
+						});
 					}
 				});
 			} else {
@@ -385,8 +905,15 @@ module.exports = function(app, nodeuuid){
 						res.json(jsonResult, 400);
 						return;
 					} else {
-						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-						res.json(jsonResult,200);
+						logModel.insertLogLocation(objects.userid,
+												   locationid,
+												   retJson.namelocation,
+												   retJson.city,
+												   retJson.country,
+												   'get', function (err, retLog) {
+							var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+							res.json(jsonResult,200);
+						});
 					}
 				});
 			} else {
@@ -933,8 +1460,23 @@ module.exports = function(app, nodeuuid){
 						res.json(jsonResult, 400);
 						return;
 					} else {
-						var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-						res.json(jsonResult,200);
+						locationModel.getLocation(locationid, function (err, retLocation) {
+							if (err) {
+								var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+								res.json(jsonResult, 400);
+								return;
+							} else {
+								logModel.insertLogLocation(objects.userid,
+														   locationid,
+														   retLocation.namelocation,
+														   retLocation.city,
+														   retLocation.country,
+														   'like', function (err, retLog) {
+									var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+									res.json(jsonResult,200);
+								});
+							}
+						});
 					}
 				});
 			} else {
@@ -1077,8 +1619,23 @@ module.exports = function(app, nodeuuid){
 						res.json(jsonResult, 400);
 						return;
 					} else {
-						var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-						res.json(jsonResult,200);
+						locationModel.getLocation(locationid, function (err, retLocation) {
+							if (err) {
+								var jsonResult = createJsonResult('CheckinLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+								res.json(jsonResult, 400);
+								return;
+							} else {
+								logModel.insertLogLocation(objects.userid,
+														   locationid,
+														   retLocation.namelocation,
+														   retLocation.city,
+														   retLocation.country,
+														   'checkin', function (err, retLog) {
+									var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+									res.json(jsonResult,200);
+								});
+							}
+						});
 					}
 				});
 			} else {
