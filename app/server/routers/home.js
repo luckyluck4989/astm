@@ -48,7 +48,12 @@ module.exports = function(app, nodeuuid){
 	// ADMIN
 	//------------------------------------------------------------------
 	app.get('/',function(req,res){
-		res.render('block/admin', { title: 'Admin Page' });
+		if(req.session.user != undefined){
+			res.redirect('/listlocation');
+		} else {
+			// path : use for show view is login or home page
+			res.redirect('/loginad');
+		}
 	});
 
 	app.get('/admin',function(req,res){
@@ -111,7 +116,7 @@ module.exports = function(app, nodeuuid){
 			res.redirect('/listlocation');
 		} else {
 			// path : use for show view is login or home page
-			res.render('block/loginad', { title: 'List Location', path: req.path });
+			res.render('block/loginad', { title: 'Login', path: req.path });
 		}
 	});
 
@@ -161,9 +166,9 @@ module.exports = function(app, nodeuuid){
 	app.get('/location',function(req,res){
 		if(req.session.user != null){
 			if(req.session.locationid != null){
-				res.render('block/location', { title: 'Admin Page', path: req.path, locationid : req.session.locationid });
+				res.render('block/location', { title: 'Location', path: req.path, locationid : req.session.locationid });
 			} else {
-				res.render('block/location', { title: 'Admin Page', path: req.path, locationid : null });
+				res.render('block/location', { title: 'Location', path: req.path, locationid : null });
 			}
 		} else {
 			res.redirect('/loginad');
