@@ -191,8 +191,8 @@ $(document).ready(function() {
 					var arrCoordinate = [];
 					if(oldJson == undefined || oldJson.address != $("#searchTextField").val())
 					{
-						arrCoordinate.push(autocomplete.getPlace().geometry.location.lng());
 						arrCoordinate.push(autocomplete.getPlace().geometry.location.lat());
+						arrCoordinate.push(autocomplete.getPlace().geometry.location.lng());
 					} else {
 						arrCoordinate = oldJson.coordinate;
 					}
