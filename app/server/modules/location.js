@@ -85,7 +85,8 @@ exports.addLocation = function(input, callback){
 		// Post to facebook
 		//-----------------------------------------
 		var form = new FormData(); //Create multipart form
-		form.append('file', fs.createReadStream('./app/public/upload/'+ itemEntry.imagethumb)); //Put file
+		var imageName = itemEntry.imagethumb.substr(itemEntry.imagethumb.indexOf('/upload/') + 8,itemEntry.imagethumb.length);
+		form.append('file', fs.createReadStream('./app/public/upload/'+ imageName)); //Put file
 		form.append('message', itemEntry.description); //Put message
 		 
 		//POST request options, notice 'path' has access_token parameter
