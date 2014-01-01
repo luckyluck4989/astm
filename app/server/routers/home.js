@@ -43,6 +43,27 @@ function createJsonResult(func,mthod,stt,msg,err,res){
 	return jsonResult;
 }
 
+//--------------------------------
+// VALIDATE PARAMETER
+// value: value of parameter
+// type: type of parameter
+// Return: json result
+//--------------------------------
+function validateParam(value, type){
+	// TYPE 1 : OBJECTID
+	if( type == 1){
+		if( value == null){
+			return "Locationid is null !";
+		} else if(value.length != 24){
+			return "Length of locationid is not valid !";
+		} else {
+			return "";
+		}
+	} else {
+		return "";
+	}
+}
+
 module.exports = function(app, nodeuuid){
 	//------------------------------------------------------------------
 	// ADMIN
@@ -629,6 +650,29 @@ module.exports = function(app, nodeuuid){
 		}
 	});
 
+	//--------------------------------
+	// Update Recommend List Location
+	// Return: List Location
+	//--------------------------------
+	app.post('/updaterecommend',function(req,res){
+		if(req.session.user != null){
+			var input = req.body;
+			var listlocationid = input.listlocationid;
+			console.log(listlocationid);
+			locationModel.updateListRecommend(listlocationid, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('Delete Location', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('Delete Location', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					res.json(jsonResult,200);
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
 	//------------------------------------------------------------------
 	// API
 	// Add location event
@@ -898,34 +942,42 @@ module.exports = function(app, nodeuuid){
 	app.get('/getlocation',function(req,res){
 		var token = req.param('token');
 		var locationid = req.param('locationid');
-		accountModel.checkToken(token, function (err, objects) {
-			if (err) {
-				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else if(objects != null && objects.userid != undefined ){
-				locationModel.getLocation(locationid, function (err, retJson) {
-					if (err) {
-						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-						res.json(jsonResult, 400);
-						return;
-					} else {
-						logModel.insertLogLocation(objects.userid,
-												   locationid,
-												   retJson.namelocation,
-												   retJson.city,
-												   retJson.country,
-												   'get', function (err, retLog) {
-							var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-							res.json(jsonResult,200);
-						});
-					}
-				});
-			} else {
-				var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
-				res.json(jsonResult, 400);
-			}
-		});
+
+		// Validate locationid
+		var errmsg = validateParam(locationid.toString(),1);
+		if(errmsg != ""){
+			var jsonResult = createJsonResult('GetLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, errmsg, null)
+			res.json(jsonResult, 400);
+		} else {
+			accountModel.checkToken(token, function (err, objects) {
+				if (err) {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else if(objects != null && objects.userid != undefined ){
+					locationModel.getLocation(locationid, function (err, retJson) {
+						if (err) {
+							var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							logModel.insertLogLocation(objects.userid,
+													   locationid,
+													   retJson.namelocation,
+													   retJson.city,
+													   retJson.country,
+													   'get', function (err, retLog) {
+								var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+								res.json(jsonResult,200);
+							});
+						}
+					});
+				} else {
+					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+					res.json(jsonResult, 400);
+				}
+			});
+		}
 	});
 
 	//--------------------------------
@@ -1176,27 +1228,35 @@ module.exports = function(app, nodeuuid){
 	app.get('/addlocationcomment',function(req,res){
 		var token = req.param('token');
 		var locationid = req.param('locationid');
-		accountModel.checkToken(token, function (err, objects) {
-			if (err) {
-				var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else if(objects != null && objects.userid != undefined ){
-				locationModel.addLocationComment(locationid, function (err, retJson) {
-					if (err) {
-						var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-						res.json(jsonResult, 400);
-						return;
-					} else {
-						var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-						res.json(jsonResult,200);
-					}
-				});
-			} else {
-				var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
-				res.json(jsonResult, 400);
-			}
-		});
+
+		// Validate locationid
+		var errmsg = validateParam(locationid.toString(),1);
+		if(errmsg != ""){
+			var jsonResult = createJsonResult('AddLocationComment', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, errmsg, null)
+			res.json(jsonResult, 400);
+		} else {
+			accountModel.checkToken(token, function (err, objects) {
+				if (err) {
+					var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else if(objects != null && objects.userid != undefined ){
+					locationModel.addLocationComment(locationid, function (err, retJson) {
+						if (err) {
+							var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+							res.json(jsonResult,200);
+						}
+					});
+				} else {
+					var jsonResult = createJsonResult('AddLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+					res.json(jsonResult, 400);
+				}
+			});
+		}
 	});
 
 	//--------------------------------
@@ -1206,27 +1266,35 @@ module.exports = function(app, nodeuuid){
 	app.get('/addlocationlike',function(req,res){
 		var token = req.param('token');
 		var locationid = req.param('locationid');
-		accountModel.checkToken(token, function (err, objects) {
-			if (err) {
-				var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else if(objects != null && objects.userid != undefined ){
-				locationModel.addLocationLike(locationid, function (err, retJson) {
-					if (err) {
-						var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-						res.json(jsonResult, 400);
-						return;
-					} else {
-						var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-						res.json(jsonResult,200);
-					}
-				});
-			} else {
-				var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
-				res.json(jsonResult, 400);
-			}
-		});
+
+		// Validate locationid
+		var errmsg = validateParam(locationid.toString(),1);
+		if(errmsg != ""){
+			var jsonResult = createJsonResult('AddLocationLike', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, errmsg, null)
+			res.json(jsonResult, 400);
+		} else {
+			accountModel.checkToken(token, function (err, objects) {
+				if (err) {
+					var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else if(objects != null && objects.userid != undefined ){
+					locationModel.addLocationLike(locationid, function (err, retJson) {
+						if (err) {
+							var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+							res.json(jsonResult,200);
+						}
+					});
+				} else {
+					var jsonResult = createJsonResult('AddLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+					res.json(jsonResult, 400);
+				}
+			});
+		}
 	});
 
 	//--------------------------------
@@ -1267,27 +1335,35 @@ module.exports = function(app, nodeuuid){
 		var token = req.param('token');
 		var locationid = req.param('locationid');
 		var cmt = req.param('comment');
-		accountModel.checkToken(token, function (err, objects) {
-			if (err) {
-				var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else if(objects != null && objects.userid != undefined ){
-				locationModel.updateLocationComment(locationid, cmt, function (err, retJson) {
-					if (err) {
-						var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-						res.json(jsonResult, 400);
-						return;
-					} else {
-						var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-						res.json(jsonResult,200);
-					}
-				});
-			} else {
-				var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
-				res.json(jsonResult, 400);
-			}
-		});
+
+		// Validate locationid
+		var errmsg = validateParam(locationid.toString(),1);
+		if(errmsg != ""){
+			var jsonResult = createJsonResult('UpdateLocationComment', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, errmsg, null)
+			res.json(jsonResult, 400);
+		} else {
+			accountModel.checkToken(token, function (err, objects) {
+				if (err) {
+					var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else if(objects != null && objects.userid != undefined ){
+					locationModel.updateLocationComment(locationid, cmt, function (err, retJson) {
+						if (err) {
+							var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+							res.json(jsonResult,200);
+						}
+					});
+				} else {
+					var jsonResult = createJsonResult('UpdateLocationComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+					res.json(jsonResult, 400);
+				}
+			});
+		}
 	});
 
 	//--------------------------------
@@ -1298,27 +1374,35 @@ module.exports = function(app, nodeuuid){
 		var token = req.param('token');
 		var locationid = req.param('locationid');
 		var like = req.param('like');
-		accountModel.checkToken(token, function (err, objects) {
-			if (err) {
-				var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else if(objects != null && objects.userid != undefined ){
-				locationModel.updateLocationLike(locationid, like, function (err, retJson) {
-					if (err) {
-						var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-						res.json(jsonResult, 400);
-						return;
-					} else {
-						var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-						res.json(jsonResult,200);
-					}
-				});
-			} else {
-				var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
-				res.json(jsonResult, 400);
-			}
-		});
+
+		// Validate locationid
+		var errmsg = validateParam(locationid.toString(),1);
+		if(errmsg != ""){
+			var jsonResult = createJsonResult('UpdateLocationLike', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, errmsg, null)
+			res.json(jsonResult, 400);
+		} else {
+			accountModel.checkToken(token, function (err, objects) {
+				if (err) {
+					var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else if(objects != null && objects.userid != undefined ){
+					locationModel.updateLocationLike(locationid, like, function (err, retJson) {
+						if (err) {
+							var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+							res.json(jsonResult,200);
+						}
+					});
+				} else {
+					var jsonResult = createJsonResult('UpdateLocationLike', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+					res.json(jsonResult, 400);
+				}
+			});
+		}
 	});
 
 	//--------------------------------
@@ -1420,27 +1504,35 @@ module.exports = function(app, nodeuuid){
 	app.get('/deletelocation',function(req,res){
 		var token = req.param('token');
 		var locationid = req.param('locationid');
-		accountModel.checkToken(token, function (err, objects) {
-			if (err) {
-				var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else if(objects != null && objects.userid != undefined ){
-				locationModel.deleteLocation(locationid, function (err, retJson) {
-					if (err) {
-						var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-						res.json(jsonResult, 400);
-						return;
-					} else {
-						var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-						res.json(jsonResult,200);
-					}
-				});
-			} else {
-				var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
-				res.json(jsonResult, 400);
-			}
-		});
+
+		// Validate locationid
+		var errmsg = validateParam(locationid.toString(),1);
+		if(errmsg != ""){
+			var jsonResult = createJsonResult('DeleteLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, errmsg, null)
+			res.json(jsonResult, 400);
+		} else {
+			accountModel.checkToken(token, function (err, objects) {
+				if (err) {
+					var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else if(objects != null && objects.userid != undefined ){
+					locationModel.deleteLocation(locationid, function (err, retJson) {
+						if (err) {
+							var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+							res.json(jsonResult,200);
+						}
+					});
+				} else {
+					var jsonResult = createJsonResult('DeleteLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+					res.json(jsonResult, 400);
+				}
+			});
+		}
 	});
 
 	//--------------------------------
@@ -1453,42 +1545,50 @@ module.exports = function(app, nodeuuid){
 		var locationid = input.locationid;
 		var nlike = input.like;
 		var ncomment = input.comment;
-		accountModel.checkToken(token, function (err, objects) {
-			if (err) {
-				var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else if(objects != null && objects.userid != undefined ){
-				locationModel.updateLocationLikeComment(locationid, nlike, ncomment, function (err, retJson) {
-					if (err) {
-						var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-						res.json(jsonResult, 400);
-						return;
-					} else {
-						locationModel.getLocation(locationid, function (err, retLocation) {
-							if (err) {
-								var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-								res.json(jsonResult, 400);
-								return;
-							} else {
-								logModel.insertLogLocation(objects.userid,
-														   locationid,
-														   retLocation.namelocation,
-														   retLocation.city,
-														   retLocation.country,
-														   'like', function (err, retLog) {
-									var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-									res.json(jsonResult,200);
-								});
-							}
-						});
-					}
-				});
-			} else {
-				var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
-				res.json(jsonResult, 400);
-			}
-		});
+
+		// Validate locationid
+		var errmsg = validateParam(locationid.toString(),1);
+		if(errmsg != ""){
+			var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, errmsg, null)
+			res.json(jsonResult, 400);
+		} else {
+			accountModel.checkToken(token, function (err, objects) {
+				if (err) {
+					var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else if(objects != null && objects.userid != undefined ){
+					locationModel.updateLocationLikeComment(locationid, nlike, ncomment, function (err, retJson) {
+						if (err) {
+							var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							locationModel.getLocation(locationid, function (err, retLocation) {
+								if (err) {
+									var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+									res.json(jsonResult, 400);
+									return;
+								} else {
+									logModel.insertLogLocation(objects.userid,
+															   locationid,
+															   retLocation.namelocation,
+															   retLocation.city,
+															   retLocation.country,
+															   'like', function (err, retLog) {
+										var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+										res.json(jsonResult,200);
+									});
+								}
+							});
+						}
+					});
+				} else {
+					var jsonResult = createJsonResult('UpdateLocationLikeComment', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+					res.json(jsonResult, 400);
+				}
+			});
+		}
 	});
 
 	//--------------------------------
@@ -1610,44 +1710,51 @@ module.exports = function(app, nodeuuid){
 		var token	  = input.token;
 		var locationid = input.locationid;
 
-		accountModel.checkToken(token, function (err, objects) {
-			if (err) {
-				var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
-				res.json(jsonResult, 400);
-				return;
-			} else if(objects != null && objects.userid != undefined ){
-				locationModel.checkinLocation(
-					objects.userid,
-					locationid, function (err, retJson) {
-					if (err) {
-						var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
-						res.json(jsonResult, 400);
-						return;
-					} else {
-						locationModel.getLocation(locationid, function (err, retLocation) {
-							if (err) {
-								var jsonResult = createJsonResult('CheckinLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
-								res.json(jsonResult, 400);
-								return;
-							} else {
-								logModel.insertLogLocation(objects.userid,
-														   locationid,
-														   retLocation.namelocation,
-														   retLocation.city,
-														   retLocation.country,
-														   'checkin', function (err, retLog) {
-									var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
-									res.json(jsonResult,200);
-								});
-							}
-						});
-					}
-				});
-			} else {
-				var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
-				res.json(jsonResult, 400);
-			}
-		});
+		// Validate locationid
+		var errmsg = validateParam(locationid.toString(),1);
+		if(errmsg != ""){
+			var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, errmsg, null)
+			res.json(jsonResult, 400);
+		} else {
+			accountModel.checkToken(token, function (err, objects) {
+				if (err) {
+					var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else if(objects != null && objects.userid != undefined ){
+					locationModel.checkinLocation(
+						objects.userid,
+						locationid, function (err, retJson) {
+						if (err) {
+							var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, err, null)
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							locationModel.getLocation(locationid, function (err, retLocation) {
+								if (err) {
+									var jsonResult = createJsonResult('CheckinLocation', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+									res.json(jsonResult, 400);
+									return;
+								} else {
+									logModel.insertLogLocation(objects.userid,
+															   locationid,
+															   retLocation.namelocation,
+															   retLocation.city,
+															   retLocation.country,
+															   'checkin', function (err, retLog) {
+										var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+										res.json(jsonResult,200);
+									});
+								}
+							});
+						}
+					});
+				} else {
+					var jsonResult = createJsonResult('CheckinLocation', METHOD_POS, STATUS_FAIL, SYSTEM_ERR, MSG_INVALID_TOKEN, null)
+					res.json(jsonResult, 400);
+				}
+			});
+		}
 	});
 
 	//--------------------------------

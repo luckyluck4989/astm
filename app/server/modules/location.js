@@ -6,7 +6,7 @@ var locationDB = cnMongoDB.location;
 var accountDB = cnMongoDB.account;
 var https = require('https'); //Https module of Node.js
 var FormData = require('form-data'); //Pretty multipart form maker.
-var ACCESS_TOKEN = "CAAICtp62IZBgBAFBWLnjZAf63Vtt8W6zpXNZALqi2Pd6Fuisl0dfkE5w6HjZBSyLfj99NlaETUZBSJtELdtySHy00R1Ls7bXNtDZBL3IMRtnZBIgx1NZCV0RtTulGSPld0hGwGxFu4oICjfdMQVbph7ig3ZA72j3XPS59qu8JZCYC615bXLcp2mauEc0NpxSXKg0wqgjW27zdvpQZDZD";
+var ACCESS_TOKEN = "CAAICtp62IZBgBAPdJ6Ohck0FhYsmiZCrOs2yZCN0Ai7JH1wNqnZC0tVfCOetqXCY60j3EfGadAK3cljdBgYQrI88qJYjuPz9J8z3tJYR9oOVzWoXfY6SL9akjwXZBwE6xhqA9csNQZCZA42BM7CLdQlD556Y6G5LIdbrLzvXRXhspE3PtVZB3LnZC";
 
 //--------------------------------
 // Function Add Image
@@ -283,7 +283,7 @@ exports.deleteLocation = function(locationid, callback){
 // Param callback: funtion callback
 //--------------------------------
 exports.updateLocationLikeComment = function(locationid, nlike, ncomment, callback){
-	locationDB.update({ _id : new ObjectID(locationid) }, 
+	locationDB.update({ _id : locationid }, 
 					  { $set : { like : Number(nlike), comment : Number(ncomment) } }, function(err,result){
 		if(err)
 			callback(err,'Can not update');

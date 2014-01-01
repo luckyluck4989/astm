@@ -59,6 +59,9 @@ app.configure('development', function () {
 
 var server = http.createServer(app);
 
+process.on('uncaughtException', function (err) {
+	console.error(err);
+});
 /**
 * ROUTING
 * -------------------------------------------------------------------------------------------------

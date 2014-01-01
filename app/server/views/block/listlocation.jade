@@ -17,9 +17,9 @@ block content
 					.box-content
 						.btn-toolbar.pull-right
 							.btn-group
-								a.btn.btn-circle.show-tooltip(title='', href='/location', data-original-title='Add new record')
+								a.btn.btn-circle.show-tooltip(title='', href='/location', data-original-title='Add new location')
 									i.icon-plus
-								a.btn.btn-circle.show-tooltip(title='', href='#', data-original-title='Edit selected')
+								a.btn.btn-circle.show-tooltip#updaterec(title='', href='#', data-original-title='Update Recommend')
 									i.icon-edit
 							.btn-group
 								a.btn.btn-circle.show-tooltip(title='', href='/listlocation', data-original-title='Refresh')
@@ -31,7 +31,7 @@ block content
 								thead
 									tr
 										th(style='width:18px')
-											input(type='checkbox')
+											input#chbAll(type='checkbox')
 										th Name Location
 										th Country
 										th City
@@ -45,7 +45,7 @@ block content
 											if(i%2 != 0)
 												tr
 													td
-														input(type='checkbox')
+														input.chblocation(type='checkbox')
 													td
 														a(href='#', class='locaid')= resultJson.result[i].namelocation
 													td= resultJson.result[i].country
@@ -67,7 +67,7 @@ block content
 											else
 												tr.table-flag-blue
 													td
-														input(type='checkbox')
+														input.chblocation(type='checkbox')
 													td
 														a(href='#', class='locaid')= resultJson.result[i].namelocation
 													td= resultJson.result[i].country

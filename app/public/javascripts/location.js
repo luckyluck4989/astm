@@ -189,7 +189,7 @@ $(document).ready(function() {
 				beforeSubmit : function(formData, jqForm, options){
 					formData.push({name:"imagelist",value:arrImage});
 					var arrCoordinate = [];
-					if(oldJson.address != $("#searchTextField").val())
+					if(oldJson == undefined || oldJson.address != $("#searchTextField").val())
 					{
 						arrCoordinate.push(autocomplete.getPlace().geometry.location.ob);
 						arrCoordinate.push(autocomplete.getPlace().geometry.location.pb);

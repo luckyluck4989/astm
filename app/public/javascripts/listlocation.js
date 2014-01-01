@@ -1,3 +1,4 @@
+var curPage = 0;
 //-------------------------------
 // Initalize function
 //-------------------------------
@@ -23,6 +24,7 @@ $(document).ready(function() {
 		$($('#pagingid  li')[idActive]).addClass('active')
 
 		// Call ajax to get data by page
+		curPage = idActive;
 		var input = {"page" : idActive};
 		$.ajax({
 			url: '/listlocation',
@@ -87,6 +89,64 @@ $(document).ready(function() {
 		});
 		return false;
 	});
+
+	//-------------------------------
+	// Update Recommend Event
+	//-------------------------------
+	$("#updaterec").click(function(){
+		var arrLocationID = [];
+		$("#locationtbl tbody tr").each(function(e){
+			if($(this).find(".chblocation").attr("checked") == "checked"){
+				arrLocationID.push($(this).find("#rowID").text());
+			}
+		});
+		if(arrLocationID.length == 0){
+			alert("Please choose at least one location to set become recommend !");
+		} else {
+		var input = {"listlocationid" : arrLocationID };
+			$.ajax({
+				url: '/updaterecommend',
+				type: 'POST',
+				data: input,
+				success: function(data){
+					if(data){
+						window.location.href = '/listlocation';
+					}
+				},
+				error: function(jqXHR){
+					console.log(jqXHR.responseText+' :: '+jqXHR.statusText);
+				}
+			});
+		}
+	});
+
+	//-------------------------------
+	// Check Box Event
+	//-------------------------------
+	$(".chblocation").click(function(item){
+		if($(this).attr("checked") == "checked")
+			$(this).removeAttr("checked");
+		else
+			$(this).attr("checked","checked");
+	});
+
+	//-------------------------------
+	// Check Box All Event
+	//-------------------------------
+	$("#chbAll").click(function(item){
+		if($(this).attr("checked") == "checked"){
+			$(this).removeAttr("checked");
+			$("#locationtbl tbody tr .chblocation").each(function(e){
+				$(this).removeAttr("checked");
+			});
+		} else {
+			$(this).attr("checked","checked");
+			$("#locationtbl tbody tr .chblocation").each(function(e){
+				$(this).attr("checked","checked");
+			});
+
+		}
+	});
 });
 
 //-------------------------------
@@ -101,7 +161,7 @@ function drawData(dataJson){
 			tmpRow = '	<tr >';
 		else
 			tmpRow = '	<tr class="table-flag-blue">';
-		tmpRow += '			<td><input type="checkbox"></td>'
+		tmpRow += '			<td><input type="checkbox" class="chblocation"></td>'
 		tmpRow += '			<td><a href="#" class="locaid">' + dataJson[i].namelocation + '</a></td>'
 		tmpRow += '			<td>' + dataJson[i].country + '</td><td>' + dataJson[i].city + '</td>'
 		if(dataJson[i].isrecommend == 'true')
