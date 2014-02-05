@@ -7,6 +7,7 @@ var input;
 var autocomplete;
 var infowindow;
 var oldJson;
+var arrCate,arrSubCate;
 //-----------------------------------
 // CREATE GOOGLE MAP
 //-----------------------------------
@@ -110,15 +111,19 @@ $(document).ready(function() {
 						text : item.countryName 
 					}));
 				});
+				arrCate = data.result;
 
 				$('#city')[0].options.length = 0;
 				// Draw data city
+				/*
 				$.each(data.resultcity, function (i, item) {
 					$('#city').append($('<option>', { 
 						value: item.country + '-' + item.city,
 						text : item.cityName 
 					}));
 				});
+				*/
+				arrSubCate = data.resultcity;
 
 				if($("#locationid").val() != ''){
 					// Call ajax to get location
@@ -136,6 +141,7 @@ $(document).ready(function() {
 								$("#city").val(data.result.city);
 								$("#description").val(data.result.description);
 								$("#searchTextField").val(data.result.address);
+								filerCategory(data.result.country);
 								if(data.result.isrecommend == 'true' )
 									$("#isrecommend").attr('checked',true);
 								else
@@ -177,6 +183,13 @@ $(document).ready(function() {
 			console.log(jqXHR.responseText+' :: '+jqXHR.statusText);
 		}
 	});
+
+	// select category change
+	$("#country").change(function(){
+		var myselect = document.getElementById("country");
+		filerCategory(myselect.options[myselect.selectedIndex].value);
+	});
+
 
 	// upload image review place
 	$("#btnSave").click(function(e){
@@ -224,7 +237,7 @@ $(document).ready(function() {
 					A.hide();
 					B.show();
 					for(var i =0; i< response.length; i++){
-						var img = '<img src="/upload/'+ response[i] +'">';
+						var img = '<img width="200px" height="auto" src="/upload/'+ response[i] +'">';
 						response[i] = document.location.origin + '/upload/' + response[i];
 						$('#listImage').append(img);
 					}
@@ -246,3 +259,17 @@ $(document).ready(function() {
 		window.location.href = '/listlocation';
 	});
 });
+
+function filerCategory(cateid){
+	$('#city')[0].options.length = 0;
+	// Draw data city
+	$.each(arrSubCate, function (i, item) {
+		if(item.country == cateid)
+		{
+			$('#city').append($('<option>', { 
+				value: item.country + '-' + item.city,
+				text : item.cityName 
+			}));
+		}
+	});
+}

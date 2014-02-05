@@ -87,7 +87,8 @@ module.exports = function(app, nodeuuid){
 	//------------------------------------------------------------------
 	app.get('/listlocation',function(req,res){
 		if(req.session.user != null){
-			var page = 1;
+			var input = req.body;
+			var page = input.page;
 			var offset = 10;
 			locationModel.getListLocation(page, offset, function (err, retJson) {
 				if (err) {
@@ -95,13 +96,14 @@ module.exports = function(app, nodeuuid){
 					res.json(jsonResult, 400);
 					return;
 				} else {
-					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+					var jsonResult = createJsonResult('Login', METHOD_POS, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
 					res.render('block/listlocation', { title: 'List Location', path : req.path, resultJson : jsonResult });
 				}
 			});
 		} else {
 			res.redirect('/loginad');
 		}
+
 	});
 
 	//------------------------------------------------------------------
@@ -119,8 +121,11 @@ module.exports = function(app, nodeuuid){
 					res.json(jsonResult, 400);
 					return;
 				} else {
-					var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
-					res.json(jsonResult, 200);
+					locationModel.getCountListLocation(function (err, retJsonCount) {
+						var jsonResult = createJsonResult('GetLocation', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+						jsonResult.result2 = retJsonCount;
+						res.json(jsonResult, 200);
+					});
 				}
 			});
 		} else {

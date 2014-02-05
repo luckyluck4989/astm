@@ -40,7 +40,7 @@ block content
 										th(style='display:none;')
 										th.visible-md.visible-lg(style='width:130px') Action
 								tbody
-									if(resultJson.result.length>0)
+									if(resultJson.result.length > 0)
 										-	for(var i=0;i<resultJson.result.length;i++)
 											if(i%2 != 0)
 												tr
@@ -88,22 +88,6 @@ block content
 																i.icon-trash
 						.text-center
 							ul.pagination#pagingid
-								li
-									a(href='#',id="prev") ← Prev
-								li
-									a(href='#',id="1") 1
-								li
-									a(href='#',id="2") 2
-								li.active
-									a(href='#',id="3") 3
-								li
-									a(href='#',id="4") 4
-								li
-									a(href='#',id="5") 5
-								li
-									a(href='#',id="6") 6
-								li
-									a(href='#',id="next") Next → 
 block scripts
 	script(src='/vendor/jquery.form.js')
 	script(src='/javascripts/listlocation.js')

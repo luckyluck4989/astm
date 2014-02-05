@@ -366,3 +366,16 @@ exports.deleteLocation = function(locationid, callback){
 			callback(null,result);
 	});
 }
+
+//--------------------------------
+// Get count list location
+// Param callback: funtion callback
+//--------------------------------
+exports.getCountListLocation = function(callback){
+	locationDB.count({}, function(err,result){
+		if(err)
+			callback(err,'Can not get list location');
+		else
+			callback(null,result);
+	});
+}
