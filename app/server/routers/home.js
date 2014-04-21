@@ -1954,4 +1954,78 @@ module.exports = function(app, nodeuuid){
 			}
 		});
 	});
+
+	//--------------------------------
+	// Get list country
+	// Return: Draw view user by month
+	//--------------------------------
+	app.post('/image',function(req,res){
+		if(req.session.user != null){
+			var page = req.param('page');
+			var offset = 40;
+			imageModel.getImageNewest(page, offset, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('GetListNewsCH', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					imageModel.getCountImageNewest(function (err, retJsonCount) {
+						var jsonResult = createJsonResult('GetListNewsCH', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+						jsonResult.result2 = retJsonCount;
+						res.json(jsonResult, 200);
+					});
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//--------------------------------
+	// Get list country
+	// Return: Draw view user by month
+	//--------------------------------
+	app.post('/delimage',function(req,res){
+		var page = req.param('page');
+		var offset = 40;
+		if(req.session.user != null){
+			var imageid = req.param('imageid');
+			imageModel.deleteImage(imageid, function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('DeleteImage', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					imageModel.getImageNewest(page, offset, function (err, retJson) {
+						if (err) {
+							var jsonResult = createJsonResult('GetListNewsCH', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null);
+							res.json(jsonResult, 400);
+							return;
+						} else {
+							imageModel.getCountImageNewest(function (err, retJsonCount) {
+								var jsonResult = createJsonResult('GetListNewsCH', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson);
+								jsonResult.result2 = retJsonCount;
+								res.json(jsonResult, 200);
+							});
+						}
+					});
+				}
+			});
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	//------------------------------------------------------------------
+	// Get list learn category page = 1
+	// Return: render learn category list page
+	//------------------------------------------------------------------
+	app.get('/image',function(req,res){
+		if(req.session.user != null){
+			var jsonResult = createJsonResult('GetListImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, null);
+			res.render('block/image', { title: 'Image Manage', path : req.path, resultJson : jsonResult });
+		} else {
+			res.redirect('/loginad');
+		}
+	});	
 };

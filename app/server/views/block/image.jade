@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+	#main-content
+		.row
+			.col-md-12
+				.box.box-orange
+					.box-title
+						h3
+							i.icon-file
+							| Image Manage
+						.box-tool
+							a(data-action="collapse", href="#")
+								i.icon-chevron-up
+							a(data-action="close", href="#")
+								i.icon-remove
+					.box-content(style="min-height:500px;")
+						ul.demo-glyphicons#listimage
+						.text-center
+							ul.pagination#pagingid
+block scripts
+	script(src='/vendor/jquery.form.js')
+	script(src='/javascripts/image.js')

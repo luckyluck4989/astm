@@ -229,6 +229,19 @@ exports.getImageNewest = function(page, offset, callback){
 	});
 }
 
+//--------------------------------
+// Get count list news dd
+// Param callback: funtion callback
+//--------------------------------
+exports.getCountImageNewest = function(callback){
+	imageDB.count({}, function(err,result){
+		if(err)
+			callback(err,'Can not get list location');
+		else
+			callback(null,result);
+	});
+}
+
 // Get list image newest
 exports.getImageRandom = function(page, offset, callback){
 	var iSkip = (page - 1)* offset;

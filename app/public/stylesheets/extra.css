@@ -1,0 +1,28 @@
+.item-img-mana{
+	display:inline-block;
+	width:130px;
+	height:30px;
+	margin:5px;
+	padding:0px !important; 
+	position:relative;
+}
+.item-img-mana img{
+	width:100%;
+	height:100%;
+	border: 1px solid rgba(0, 0, 0, .1);
+}
+.item-img-mana .iim-remove{
+	position: absolute;
+	top: 4px;
+	right: 5px;
+	display: none;
+	width: 20px;
+	height: 20px;
+	background-color: rgb(61, 85, 213);
+	border-radius: 10px;
+	font-size: 12px;
+	font-style: normal;
+	color: white;
+	padding: 2px;
+	cursor: pointer;
+}
