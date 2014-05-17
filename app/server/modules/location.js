@@ -345,7 +345,7 @@ exports.getCheckinLocation = function(userid,page,offset,callback){
 exports.getListLocation = function(page,offset,callback){
 	var iSkip = (page - 1)* offset;
 	var iOffset = page * offset;
-	locationDB.find({}).sort([['_id','desc']]).skip(iSkip).limit(iOffset).toArray(function(err,result){
+	locationDB.find({}).sort([['_id','desc']]).skip(iSkip).limit(offset).toArray(function(err,result){
 		if(err)
 			callback(err,'Can not get list location');
 		else

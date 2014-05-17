@@ -40,7 +40,7 @@ block content
 										th(style='display:none;')
 										th.visible-md.visible-lg(style='width:130px') Action
 								tbody
-									if(resultJson.result.length > 0)
+									if(resultJson.resul !=  null && resultJson.result.length > 0)
 										-	for(var i=0;i<resultJson.result.length;i++)
 											if(i%2 != 0)
 												tr

@@ -11,6 +11,7 @@ $(document).ready(function() {
 		type: 'POST',
 		data: {"page" : 1},
 		success: function(data){
+			$("#locationtbl tbody tr").remove();
 			if(data.result[0]){
 				drawData(data.result);
 			}
@@ -74,7 +75,6 @@ $(document).ready(function() {
 // Draw data to table
 //-------------------------------
 function drawData(dataJson){
-	$("#locationtbl tbody tr").remove();
 	var tmpRow = '';
 	for(var i = 0; i< dataJson.length; i++){
 		// create row html
@@ -226,12 +226,12 @@ function splitPage(total){
 		// Call ajax to get data by page
 		curPage = idActive;
 		var input = {"page" : idActive};
-
 		$.ajax({
 			url: '/listlocation',
 			type: 'POST',
 			data: input,
 			success: function(data){
+				$("#locationtbl tbody tr").remove();
 				if(data.result[0]){
 					drawData(data.result);
 				}
