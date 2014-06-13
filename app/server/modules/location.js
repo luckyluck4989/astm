@@ -4,6 +4,8 @@ var cnMongoDB = require('../mongodb/connection'),
 var MongoDb = require("mongodb");
 var locationDB = cnMongoDB.location;
 var accountDB = cnMongoDB.account;
+var countryDB = cnMongoDB.country;
+var cityDB  = cnMongoDB.city;
 var https = require('https'); //Https module of Node.js
 var FormData = require('form-data'); //Pretty multipart form maker.
 var ACCESS_TOKEN = "CAAICtp62IZBgBAPdJ6Ohck0FhYsmiZCrOs2yZCN0Ai7JH1wNqnZC0tVfCOetqXCY60j3EfGadAK3cljdBgYQrI88qJYjuPz9J8z3tJYR9oOVzWoXfY6SL9akjwXZBwE6xhqA9csNQZCZA42BM7CLdQlD556Y6G5LIdbrLzvXRXhspE3PtVZB3LnZC";
@@ -147,11 +149,42 @@ exports.addLocation = function(input, callback){
 // Param callback: funtion callback
 //--------------------------------
 exports.getRecommendLocation = function(userid,callback){
-	locationDB.find({"isrecommend":"true"}).toArray(function(err,result){
-		if(err)
-			callback(err,'Can not get list location');
-		else
-			callback(null,result);
+	countryDB.find({}).sort([['country','asc']]).toArray(function(err,result){
+		if(err) {
+			callback(err,'Can not get list country');
+		} else {
+			var countryJson = result;
+			cityDB.find({}).sort([['city','asc']]).toArray(function(err,result1){
+				if(err) {
+					callback(err,'Can not get list city');
+				} else {
+					var geoInfo = result1; 
+					for (var i = 0; i < countryJson.length; i++) {
+						for (var j = 0; j < geoInfo.length; j ++) {
+							if (geoInfo[j].country == countryJson[i].country) {
+								geoInfo[j].cityName = countryJson[i].countryName + " - " + geoInfo[j].cityName;
+							}
+						}
+					}
+
+					locationDB.find({"isrecommend":"true"}).toArray(function(err,resultLocation){
+						if(err) {
+							callback(err,'Can not get list location');
+						} else {
+							for (var i = 0; i < geoInfo.length; i++) {
+								for (var j = 0; j < resultLocation.length; j++) {
+									if (resultLocation[j].city == geoInfo[i].country + "-" + geoInfo[i].city && resultLocation[j].country == geoInfo[i].country) {
+										resultLocation[j]['description'] = geoInfo[i].cityName;
+									}
+								}
+							}
+
+							callback(null,resultLocation);
+						}
+					});
+				}
+			});
+		}
 	});
 }
 
