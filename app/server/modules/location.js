@@ -67,7 +67,8 @@ exports.addLocation = function(input, callback){
 							like: 0,
 							comment: 0,
 							address : '',
-							fbid: ''
+							fbid: '',
+							countrycity: ''
 						};
 		itemEntry.namelocation = input.namelocation;
 		itemEntry.country = input.country;
@@ -79,6 +80,7 @@ exports.addLocation = function(input, callback){
 		itemEntry.coordinate = [Number(cordi[0]),Number(cordi[1])];
 		itemEntry.isrecommend = input.isrecommend;
 		itemEntry.address = input.address;
+		itemEntry.countrycity = input.country_name + " - " + input.city_name;
 		if (itemEntry._id) {
 			itemEntry._id = new ObjectID(itemEntry._id);
 		}
@@ -133,7 +135,8 @@ exports.addLocation = function(input, callback){
 									   description	: input.description,
 									   imagelist	: input.imagelist.split(","),
 									   coordinate	: [Number(cordi[0]),Number(cordi[1])],
-									   isrecommend	: input.isrecommend
+									   isrecommend	: input.isrecommend,
+									   countrycity	: input.country_name + " - " + input.city_name
 							} }, function(err,result){
 			if(err)
 				callback(err,'Can not update user');
@@ -149,41 +152,14 @@ exports.addLocation = function(input, callback){
 // Param callback: funtion callback
 //--------------------------------
 exports.getRecommendLocation = function(userid,callback){
-	countryDB.find({}).sort([['country','asc']]).toArray(function(err,result){
+	locationDB.find({"isrecommend":"true"}).toArray(function(err,resultLocation){
 		if(err) {
-			callback(err,'Can not get list country');
+			callback(err,'Can not get list location');
 		} else {
-			var countryJson = result;
-			cityDB.find({}).sort([['city','asc']]).toArray(function(err,result1){
-				if(err) {
-					callback(err,'Can not get list city');
-				} else {
-					var geoInfo = result1; 
-					for (var i = 0; i < countryJson.length; i++) {
-						for (var j = 0; j < geoInfo.length; j ++) {
-							if (geoInfo[j].country == countryJson[i].country) {
-								geoInfo[j].cityName = countryJson[i].countryName + " - " + geoInfo[j].cityName;
-							}
-						}
-					}
-
-					locationDB.find({"isrecommend":"true"}).toArray(function(err,resultLocation){
-						if(err) {
-							callback(err,'Can not get list location');
-						} else {
-							for (var i = 0; i < geoInfo.length; i++) {
-								for (var j = 0; j < resultLocation.length; j++) {
-									if (resultLocation[j].city == geoInfo[i].country + "-" + geoInfo[i].city && resultLocation[j].country == geoInfo[i].country) {
-										resultLocation[j]['description'] = geoInfo[i].cityName;
-									}
-								}
-							}
-
-							callback(null,resultLocation);
-						}
-					});
-				}
-			});
+			for (var j = 0; j < resultLocation.length; j++) {
+				resultLocation[j]['description'] = resultLocation[j].countrycity;
+			}
+			callback(null,resultLocation);
 		}
 	});
 }
@@ -410,5 +386,66 @@ exports.getCountListLocation = function(callback){
 			callback(err,'Can not get list location');
 		else
 			callback(null,result);
+	});
+}
+
+exports.refCountry = function(callback){
+	countryDB.find({}).sort([['country','asc']]).toArray(function(err,result){
+		if(err) {
+			callback(err,'Can not get list country');
+		} else {
+			var countryJson = result;
+			cityDB.find({}).sort([['city','asc']]).toArray(function(err,result1){
+				if(err) {
+					callback(err,'Can not get list city');
+				} else {
+					var geoInfo = result1; 
+					for (var i = 0; i < countryJson.length; i++) {
+						for (var j = 0; j < geoInfo.length; j ++) {
+							if (geoInfo[j].country == countryJson[i].country) {
+								geoInfo[j].cityName = countryJson[i].countryName + " - " + geoInfo[j].cityName;
+							}
+						}
+					}
+
+					locationDB.find({}).toArray(function(err,resultLocation){
+						if(err) {
+							callback(err,'Can not get list location');
+						} else {
+							resultLocation.forEach(function(doc) {
+								for (var i = 0; i < geoInfo.length; i++) {
+									if (doc.city == geoInfo[i].country + "-" + geoInfo[i].city && doc.country == geoInfo[i].country) {
+										doc.countrycity	= geoInfo[i].cityName;
+										locationDB.save(doc, {safe: true}, callback);
+									}
+								}
+							});
+						}
+					});
+				}
+			});
+		}
+	});
+}
+
+exports.refGetAll = function(callback){
+	locationDB.find({}).toArray(function(err,result){
+		if(err)
+			callback(err,'Can not get list location');
+		else
+			callback(null,result);
+	});
+}
+
+exports.refGetAll2 = function(callback){
+	locationDB.find({"isrecommend":"true"}).toArray(function(err,resultLocation){
+		if(err) {
+			callback(err,'Can not get list location');
+		} else {
+			for (var j = 0; j < resultLocation.length; j++) {
+				resultLocation[j]['description'] = resultLocation[j].countrycity;
+			}
+			callback(null,resultLocation);
+		}
 	});
 }

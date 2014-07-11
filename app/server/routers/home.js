@@ -2030,5 +2030,67 @@ module.exports = function(app, nodeuuid){
 		} else {
 			res.redirect('/loginad');
 		}
-	});	
+	});
+
+	//------------------------------------------------------------------
+	// Get list learn category page = 1
+	// Return: render learn category list page
+	//------------------------------------------------------------------
+	app.get('/refcountry',function(req,res){
+		if(req.session.user != null){
+			var jsonResult = createJsonResult('GetListImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, null);
+			locationModel.refCountry(function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('refcountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('refcountry', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+					res.json(retJson,200);
+				}
+			});
+			//res.render('block/image', { title: 'Image Manage', path : req.path, resultJson : jsonResult });
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	app.get('/refgetall',function(req,res){
+		if(req.session.user != null){
+			var jsonResult = createJsonResult('GetListImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, null);
+			locationModel.refGetAll(function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('refcountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('refcountry', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+					res.json(jsonResult,200);
+				}
+			});
+			//res.render('block/image', { title: 'Image Manage', path : req.path, resultJson : jsonResult });
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
+	app.get('/refgetall2',function(req,res){
+		if(req.session.user != null){
+			var jsonResult = createJsonResult('GetListImage', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, null);
+			locationModel.refGetAll2(function (err, retJson) {
+				if (err) {
+					var jsonResult = createJsonResult('refcountry', METHOD_GET, STATUS_FAIL, SYSTEM_ERR, err, null)
+					res.json(jsonResult, 400);
+					return;
+				} else {
+					var jsonResult = createJsonResult('refcountry', METHOD_GET, STATUS_SUCESS, SYSTEM_SUC, null, retJson)
+					res.json(jsonResult,200);
+				}
+			});
+			//res.render('block/image', { title: 'Image Manage', path : req.path, resultJson : jsonResult });
+		} else {
+			res.redirect('/loginad');
+		}
+	});
+
 };

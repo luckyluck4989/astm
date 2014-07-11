@@ -210,6 +210,8 @@ $(document).ready(function() {
 						arrCoordinate = oldJson.coordinate;
 					}
 					formData.push({name:"coordinate",value:arrCoordinate});
+					formData.push({name:"country_name", value: document.getElementById("country").options[document.getElementById("country").selectedIndex].text});
+					formData.push({name:"city_name", value: document.getElementById("city").options[document.getElementById("city").selectedIndex].text});
 				},
 				success	: function(responseText, status, xhr, $form){
 					window.location.href = '/listlocation';
